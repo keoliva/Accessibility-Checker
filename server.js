@@ -9,6 +9,7 @@ var upload = multer({ dest: 'uploads' });
 var files = [], filenames = [], outputs = []; 
 
 app.use('/static', express.static('static'));
+app.use('/uploads', express.static('uploads'));
 app.engine('html', swig.renderFile);
 
 app.route('/')
