@@ -1,0 +1,42 @@
+<h3>Selected Info Dictionary and Metadata stuff</h3>
+{% for key, value in prop|dictsort %}
+	<dt>{{ key|e }}</dt>
+	<dd>{{ value|e }}</dd>
+{% endfor%}
+<h3>Strictly Metadata</h3>
+{% if metadata is none %}
+	<dt>Doesn't contain Metadata stream...</dt>
+{% else %}
+	<h4>XmpInformation.custom_properties</h4>
+	{% for key, value in metadata.custom_properties|dictsort  %}
+		<dt>{{ key|e }}</dt>
+		<dd>{{ value|e }}</dd>
+	{% endfor %}
+	<h4>XmpInformation.pdf_keywords</h4>
+	An unformatted text string representing document keywords: 
+	{{ metadata.pdf_keywords }}
+	<h4>XmpInformation.dc_subject</h4>
+	An unordered array of descriptive phrases or keywrods 
+	that specify the topic of the content of the resource.
+	{{ metadata.dc_subject }}
+	<h4>XmpInformation.dc_title</h4>
+	A language-keyed dictionary of the title of the resource.
+	{% for key, value in metadata.dc_title|dictsort %}
+		<dt>{{ key|e }}</dt>
+		<dd>{{ value|e }}</dd>
+	{% endfor %}
+	<h4>XmpInformation.dc_description</h4>
+	(corresponds to subject) A language-keyed dictionary of textual descriptions 
+	of the content of the resource:
+	{{ metadata.dc_description['x-default'] }}
+	
+{% endif %}
+<h3>Strictly Info Dictionary</h3>
+	{% if infodict is none %}
+		<dt>Doesn't contain Info Dictionary...</dt>
+	{% else %}
+		{% for key, value in infodict|dictsort %}
+			<dt>{{ key|e }}</dt>
+			<dd>{{ value|e }}</dd>
+		{% endfor %}
+	{% endif %}	

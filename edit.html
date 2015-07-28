@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/css/edit_pg.css">
+  <!--<link rel="stylesheet" type="text/css" href="/static/css/text_selecting.css">-->
+  <script src="/static/js/page_handler.js"></script> 
+  <script src="/static/js/pdf.js"></script>
+  <script src="/static/js/pdf.worker.js"></script>
+  <script src="/static/js/display_pdf.js"></script>
+  <script src="/static/js/text_layer_builder.js"></script>
+  <script>
+  var app = angular.module('prop_app', []);
+  app.controller('prop_ctrl', function($scope) {
+	var prop = {{ data.output["properties"] | json | safe }};
+	$scope.title = prop.title;
+	$scope.author = prop.author;
+	$scope.subject = prop.subject;
+	$scope.keywords = prop.keywords;
+  });
+  </script>
+{% endblock head %}
+{% block nav %}
+<li class="active"><a href="/">Home</a></li>
+<li><a href="/about">About</a></li>
+{% endblock nav %}
+{% block content %}
+<div class="container-fluid" ng-app="prop_app" ng-controller="prop_ctrl">
+	{% include "tabs.html" %}
+
+	<div id="amend_access" class="row active_content">
+		{% include "edit_amend.html" with data %}
+		<script type="text/javascript">
+		//get the id of the file from url
+		var re = /[/](\d*$)/;
+		var url = window.location.href;
+		var results = url.match(re);
+		//remembered substring, holding the id of the file
+		var id = results[results.length - 1];
+		display_pdf('/download/'+id);
+		</script>
+	</div>
+	
+	{% include "form_for_prop.html" %}
+</div>
+{% endblock content %}

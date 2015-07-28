@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block head %}
+	<script src="/static/js/files_handler.js"></script>
+{% endblock %}
+{% block nav %}
+<li class="active"><a href="/">Home</a></li>
+<li><a href="/about">About</a></li>
+{% endblock nav %}
+{% block content %}
+<div class="container">
+	<h1>Upload Your PDFs</h1>
+	<form enctype="multipart/form-data" action="/" method="post"><br>
+	<input id="uploaded_files" name="fileitem" type="file" accept="application/pdf" 
+										multiple/><br>
+	<strong>Note: </strong> Hold down CTRL or the SHIFT key to select multiple files.
+	</form>
+	<br>
+	<ul id="files_info" class="list-group">
+	</ul>
+	<button id="submit_button">Submit PDFs</button>
+	
+</div>
+
+{% endblock content %}

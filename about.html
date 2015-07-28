@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head %}
+  <script src="/static/js/files_handler.js"></script>
+  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+  <script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+{% endblock %}
+{% block nav %}
+	<li><a href="/">Home</a></li>
+    <li class="active"><a href="/about">About</a></li>
+{% endblock nav %}
+{% block content %}
+  <div class="container">
+  <h1>Files Have Been Downloaded</h1>
+  </div>
+{% endblock content %}

@@ -1,0 +1,77 @@
+<div class="col-md-3">
+	<div id="action_wizard" class="panel-group" style="overflow:scroll;height:530px;">
+	<div class="panel panel-info">
+	<div class="panel-heading task_headings">
+	Accessibility Checker
+	</div>
+		<div class="panel-body task_panel" id="task_panel_0" >
+		<ul style="padding-left:15px;">
+			{% set tags_info = data.output.tags_info %}
+			<li>Tagged PDF: <b>{{ data.output.tagged_bool }}</b></li>
+			{% set headings = tags_info.headings %}
+			<li><ul>
+			{% for heading in headings | sort %}
+				<li>{{ heading }}: {{ headings[heading] }}</li>
+			{% endfor %}
+			</ul></li>
+			{% set figures = tags_info.figures %}
+			<li><ul>
+			{% for figure in figures %}
+				<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
+			{% endfor %}
+			</ul></li>
+			<li>Language assigned to document: <b>{{ data.output.language }}</b>
+				<div class="well well-sm">
+					It's important for screen readers to know which 
+					language they are reading in. If the major language 
+					of the document is not in this list, follow this link 
+					to get the proper <a href="http://www-01.sil.org/iso639-3/codes.asp?order=639_3&letter=a">ISO code</a> for the language.
+				</div>
+			</li>
+		</ul>
+		</div>
+	</div>
+	
+	<div class="panel panel-info">
+	<div class="panel-heading task_headings">
+	Document Properties
+	</div>
+		<div class="panel-body">
+		<u>Title:</u> <span class="prop_text" ng-bind="title"></span>
+		<br><u>Author:</u> <span class="prop_text" ng-bind="author"></span>
+		<br><u>Subject:</u> <span class="prop_text" ng-bind="subject"></span>
+		<br><u>Keywords:</u> <span class="prop_text" ng-bind="keywords"></span>
+		<br>
+		<center>
+		<button id="edit_prop_btn" class="btn" style="margin-bottom:5px;">Edit Properties</center></button>
+		<div class="well well-sm">Make sure the description 
+		does an adequate job of describing the image. 
+		If need be longer create a footnote for the image.</div>
+		</div>
+	</div>
+	
+	<div class="panel panel-info">
+	<div class="panel-heading task_headings">
+	Select the Document's Language
+	</div>
+		<div class="panel-body">
+			
+		</div>
+	</div>
+	<button class="btn btn-default btn-block"
+			style="margin-top:5px;">Run Final Accessibility Check</button>
+	</div>
+</div>
+
+<div class="col-md-6">
+	<ul class="pager" style="margin:5px;">
+		<li class="previous" id="prev"><a>Previous</a></li>
+		<li><span>Page: <span id="page_num"></span> / <span id="page_count"></span></span></li>
+		<li class="next" id="next"><a>Next</a></li>
+	</ul>
+		
+	<canvas id="the-canvas" style="border:1px solid black;height:1029px;width:795px;"></canvas>
+</div>
+<div class="col-md-3">
+</div>
+<div class="clearfix visible-lg"></div>
