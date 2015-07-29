@@ -67,11 +67,9 @@ app.route('/edit/:id')
 			curr_file_index: id,
 			output: JSON.parse(outputs[id])
 		};
-		console.log("in here");
 		console.log(doc_data.output);
 		var edit_html = path.join(__dirname + '/edit.html');
 		res.end(swig.renderFile("edit.html", {data:doc_data}));
-
 	});
 
 var server = app.listen(3000, function () {

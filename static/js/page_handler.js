@@ -6,6 +6,13 @@ $(function() {
 		});
 	});
 	
+	$('select#files').change(function() {
+		var selected_child = $(this).children(':selected')[0];
+		var index = $("option").index(selected_child);
+		window.location.href = window.location.href.replace(/[/]\d/, 
+															'/' + index.toString());
+	});
+	
 	$('#edit_prop_btn').click(function() {
 		$('#edit_prop_form').show();
 	});
