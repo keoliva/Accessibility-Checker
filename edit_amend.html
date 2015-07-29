@@ -6,20 +6,22 @@
 	</div>
 		<div class="panel-body task_panel" id="task_panel_0" >
 		<ul style="padding-left:15px;">
-			{% set tags_info = data.output.tags_info %}
 			<li>Tagged PDF: <b>{{ data.output.tagged_bool }}</b></li>
-			{% set headings = tags_info.headings %}
-			<li><ul>
-			{% for heading in headings | sort %}
-				<li>{{ heading }}: {{ headings[heading] }}</li>
-			{% endfor %}
-			</ul></li>
-			{% set figures = tags_info.figures %}
-			<li><ul>
-			{% for figure in figures %}
-				<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
-			{% endfor %}
-			</ul></li>
+			{% set tags_info = data.output.tags_info %}
+			{% if data.output.tagged_bool %}
+				{% set headings = tags_info.headings %}
+				<li><ul>
+				{% for heading in headings | sort %}
+					<li>{{ heading }}: {{ headings[heading] }}</li>
+				{% endfor %}
+				</ul></li>
+				{% set figures = tags_info.figures %}
+				<li><ul>
+				{% for figure in figures %}
+					<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
+				{% endfor %}
+				</ul></li>
+			{% endif %}
 			<li>Language assigned to document: <b>{{ data.output.language }}</b>
 				<div class="well well-sm">
 					It's important for screen readers to know which 
