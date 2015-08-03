@@ -34,7 +34,7 @@ app.route('/')
 		}
 		function run_cmd() {
 			var path = files[i]['path'];
-			var cmd = 'java -cp target/accessibility-checker-0.0.1-SNAPSHOT.jar check/Checker ' + path;
+			var cmd = 'java -cp target/accessibility-0.0.1-SNAPSHOT.jar check/Checker ' + path;
 			child_process.exec(cmd,
 			function (err, stdout, stderr) {
 				if (err) {
