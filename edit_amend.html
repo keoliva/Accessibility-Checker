@@ -2,7 +2,7 @@
 	<div id="action_wizard" class="panel-group" style="overflow:scroll;height:530px;">
 	<div class="panel panel-info">
 	<div class="panel-heading task_headings">
-	Accessibility Checker
+	Accessibility Report
 	</div>
 		<div class="panel-body task_panel" id="task_panel_0" >
 		<ul style="padding-left:15px;">
@@ -10,17 +10,22 @@
 			{% set tags_info = data.output.tags_info %}
 			{% if data.output.tagged_bool %}
 				{% set headings = tags_info.headings %}
-				<li><ul>
-				{% for heading in headings | sort %}
-					<li>{{ heading }}: {{ headings[heading] }}</li>
-				{% endfor %}
-				</ul></li>
+				{% if headings %}
+					<li><ul>
+					{% for heading in headings | sort %}
+						<li>{{ heading }}: {{ headings[heading] }}</li>
+					{% endfor %}
+					</ul></li>
+				{% endif %}
+				
 				{% set figures = tags_info.figures %}
-				<li><ul>
-				{% for figure in figures %}
-					<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
-				{% endfor %}
-				</ul></li>
+				{% if figures %}
+					<li><ul>
+					{% for figure in figures %}
+						<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
+					{% endfor %}
+					</ul></li>
+				{% endif %}
 			{% endif %}
 			<li>Language assigned to document: <b>{{ data.output.language }}</b>
 				<div class="well well-sm">
@@ -44,24 +49,14 @@
 		<br><u>Subject:</u> <span class="prop_text" ng-bind="subject"></span>
 		<br><u>Keywords:</u> <span class="prop_text" ng-bind="keywords"></span>
 		<br>
-		<center>
+		<!--<center>
 		<button id="edit_prop_btn" class="btn" style="margin-bottom:5px;">Edit Properties</center></button>
+		-->
 		<div class="well well-sm">Make sure the description 
 		does an adequate job of describing the image. 
 		If need be longer create a footnote for the image.</div>
 		</div>
 	</div>
-	
-	<div class="panel panel-info">
-	<div class="panel-heading task_headings">
-	Select the Document's Language
-	</div>
-		<div class="panel-body">
-			
-		</div>
-	</div>
-	<button class="btn btn-default btn-block"
-			style="margin-top:5px;">Run Final Accessibility Check</button>
 	</div>
 </div>
 
