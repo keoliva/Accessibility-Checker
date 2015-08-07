@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>accessibility</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>socialmicrovolunteering.pdf</name>
+			<type>1</type>
+			<location>C:/Users/Kayla/Downloads/socialmicrovolunteering.pdf</location>
+		</link>
+		<link>
+			<name>src/main/java/org/json</name>
+			<type>2</type>
+			<location>C:/Users/Kayla/Downloads/json-simple-master/json-simple-master/src/main/java/org/json</location>
+		</link>
+		<link>
+			<name>src/main/java/org/apache/commons</name>
+			<type>2</type>
+			<location>C:/Users/Kayla/Downloads/commons-logging/commons-logging-1.2-src/src/main/java/org/apache/commons</location>
+		</link>
+		<link>
+			<name>src/main/java/org/apache/fontbox</name>
+			<type>2</type>
+			<location>C:/Users/Kayla/Downloads/pdfbox-1.8.9-src (1)/pdfbox-1.8.9/fontbox/src/main/java/org/apache/fontbox</location>
+		</link>
+		<link>
+			<name>src/main/java/org/apache/jempbox</name>
+			<type>2</type>
+			<location>C:/Users/Kayla/Downloads/pdfbox-1.8.9-src (1)/pdfbox-1.8.9/jempbox/src/main/java/org/apache/jempbox</location>
+		</link>
+		<link>
+			<name>src/main/java/org/apache/pdfbox</name>
+			<type>2</type>
+			<location>C:/Users/Kayla/Downloads/pdfbox-1.8.9-src (1)/pdfbox-1.8.9/pdfbox/src/main/java/org/apache/pdfbox</location>
+		</link>
+	</linkedResources>
+</projectDescription>
