@@ -1,0 +1,31 @@
+<div class="row">
+	<div class="col-md-3">
+	<select class="form-control" id="files">
+	{% for filename in data.filenames %}
+		<option 
+		{% if loop.index0 == data.curr_file_index %}selected{% endif %}>
+		{{ filename }}</option>
+	{% endfor %}
+	</select>
+	</div>
+	<div class="col-md-6">
+	<ul class="nav nav-tabs">
+		<li id="main_tab" class="active"><a data-toggle="tab">
+		Amend Accessibility</a></li>
+		<!--<li id="tag_tab"><a id="tagged_tab"data-toggle="tab" href="">Download Updated</a></li>
+		-->
+		<!--<li id="dict_tab"><a data-toggle="tab">View Dictionaries</a></li>
+		-->
+	<script type="text/javascript">
+		//get the id of the file from url
+		var re = /[/](\d*$)/;
+		var url = window.location.href;
+		var results = url.match(re);
+		//remembered substring, holding the id of the file
+		var id = results[results.length - 1];
+		document.getElementById("tagged_tab").href = "/download/" + id;
+	</script>
+	</ul>
+	</div>
+	<div class="clearfix visible-lg"></div>
+</div>

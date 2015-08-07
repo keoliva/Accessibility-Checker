@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% block title %}{% endblock %}
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+	{% block head %}
+	{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+	<div class="navbar-header">
+	  <a class="navbar-brand" href="#">AccessiCheck</a>
+	</div>
+	<div>
+	  <ul class="nav navbar-nav">
+		{% block nav %}
+		{% endblock nav %}
+	  </ul>
+	</div>
+  </div>
+</nav>
+{% block content %}
+{% endblock %}
+</body></html>
+	

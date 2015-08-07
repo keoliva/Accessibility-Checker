@@ -1,0 +1,20 @@
+#amend_access {
+	margin-top:3px;
+}
+.panel-body {
+	display:none;
+	width:300px;
+}
+#task_panel_0 {display:block;}
+.task_headings {text-align: center;} 
+#edit_prop_form {
+	display:none;
+	position:relative;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-radius: 5px;
+	padding-top: 10px;
+	border-color: rgb(240, 240, 230);
+} 
+.well {margin-bottom:5px;}
