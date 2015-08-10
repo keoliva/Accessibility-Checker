@@ -28,6 +28,11 @@ public class StructTree {
 	static Integer pages_seen = 0;
 	static Set<Integer> curr_page_img_mcids;
 	
+	static boolean figures_warning_on = false; //if there's something off with the figures
+	static int reasonable_amount_of_headings = 5;
+	static boolean headings_warning_on = false;
+	static int headings_count = 0;
+	
 	/**
 	 * Constructor
 	 * @param root the structure tree root of a document
@@ -86,6 +91,10 @@ public class StructTree {
 		Map<String, Object> objs = new HashMap<String, Object>();
 		objs.put("headings", headings);
 		objs.put("figures", figures);
+		
+		if (headings_count < 5) {
+			headings_warning_on = true;
+		}
 		return objs;
 	}
 	
@@ -177,6 +186,7 @@ public class StructTree {
 						figure_dict.put("Warning",
 							String.format("This image is marked as a %s "
 									+ "rather than a Figure.", tag));
+						figures_warning_on = true;
 					}
 					List figure_objs = figures.get(pages_seen + 1);
 					if (figure_objs == null) {
@@ -187,6 +197,7 @@ public class StructTree {
 				} else if (isHeading(tag)) {
 					Integer count = headings.get(tag);
 					headings.put(tag, (count == null)? 1 : count + 1);
+					headings_count++;
 				}
 			}
 		}

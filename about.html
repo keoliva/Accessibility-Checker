@@ -10,7 +10,11 @@
 {% endblock nav %}
 {% block content %}
   <div class="container">
-  <h1>About</h1>
+  <div class="page-header">
+	<h1>About</h1>
+  </div>   
+    <p>A brief summary on what the checker looks for.</p>
+	
   This does a basic check on the accessibility of the PDFs uploaded. This includes :
   <ul>
 	<li>Whether or not the document is marked as a "Tagged PDF"</li>
@@ -24,8 +28,8 @@
   <h4>Structure Tree</h4>
   It is within this structure that the logical structure or the 
   hierarchy of tagged content of the document is held. Based of its existence, 
-  I know whether or not for sure if the document is tagged. I traverse 
-  this structure to find tags for headings and figures.
+  one can tell whether or not the document is tagged. This structure 
+  is traversed in order to find tags for headings and figures.
   
   <h4>Document Properties</h4>
   There are basic properties of documents that should be set 

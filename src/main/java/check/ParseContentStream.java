@@ -46,10 +46,7 @@ import org.apache.pdfbox.util.*;
 
 public class ParseContentStream extends PDFStreamEngine {
 	static Map<Float, PriorityQueue> areas = new TreeMap<Float, PriorityQueue>();
-	//static Map<Float, StringBuilder> areas = new TreeMap<Float, StringBuilder>();
 	static float max = 0.0f;
-	//static StringBuilder max_str = new StringBuilder();
-	
 	static PDPage curr_page;
 	
 	public class TextPositionCompartor implements Comparator {

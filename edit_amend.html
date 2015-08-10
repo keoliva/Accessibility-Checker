@@ -5,11 +5,27 @@
 	Accessibility Report
 	</div>
 		<div class="panel-body task_panel" id="task_panel_0" >
+		{% for key,message in data.output.general_message %}
+		<!-- The key will either be:
+		     -success
+			 -info
+			 -warning 
+			 -danger 
+			 to signify bootstrap's Contextual Classes-->
+		<div class="alert alert-{{ key }}">
+		<strong>{{ message }}</strong>
+		</div>
+		{% endfor %}
 		<ul style="padding-left:15px;">
 			<li id="tagged_bool">
 			Tagged PDF: <b>{{ data.output.tagged_bool }}</b>
 			<div class="well well-sm">
+			{% if data.output.tagged_bool %}
 			This signifies that a Structure Tree exists within your document. 
+			{% else %}
+			This signifies that a Structure Tree does not exist within your \
+			document. 
+			{% endif %}
 			</div>
 			</li>
 			{% set tags_info = data.output.tags_info %}
@@ -23,7 +39,10 @@
 					{% endfor %}
 					</ul></li>
 				{% else %}
-					<li>Need to add headings to your PDF</li>
+					<li>Need to add headings to your PDF. Do 
+					so by following the general instructions on 
+					<a href="http://help.adobe.com/en_US/acrobat/X/pro/using/WS58a04a822e3e50102bd615109794195ff-7d07.w.html">
+					tagging your PDF</a>.</li>
 				{% endif %}
 				
 				{% set figures = tags_info.figures  %}
@@ -46,6 +65,11 @@
 							</ul></li>
 					{% endfor %}
 					</ul></li>
+				{% else %}
+				<li>Make sure your images are <a href="http://help.adobe.com/en_US/acrobat/X/pro/using/WS58a04a822e3e50102bd615109794195ff-7d07.w.html">
+				tagged</a> if they're relevant to the 
+				content and to include <a href="http://help.adobe.com/en_US/acrobat/X/pro/using/WS58a04a822e3e50102bd615109794195ff-7ce1.w.html">
+				alternative text with them</a>.</li>
 				{% endif %}
 			{% endif %}
 			<li>
@@ -55,8 +79,9 @@
 				<br>
 				To add or edit an image's alternative text, go 
 				<a href="http://www.adobe.com/accessibility/products/indesign/alt-text.html">here</a>.
-				 Or you could so when you come across an element with a Figure tag when 
-				 parsing the document structure, using the directions above.
+				 Another way of doing so right clicking and editing a "Figure" 
+				 structure element in the logical structure, which you can find 
+				 using the directions above on editing the document structure.
 				</div>
 			</li>
 			<li>Language assigned to document: <b>{{ data.output.language }}</b>
