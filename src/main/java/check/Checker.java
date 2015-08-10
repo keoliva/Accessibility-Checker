@@ -138,7 +138,7 @@ public class Checker {
 			} else if (!tagged) {
 				msg.put("danger", "Your document is not tagged.");
 			} else { //at least tagged
-				msg.put("succes", "Things look good.");
+				msg.put("success", "Things look good.");
 			}
 			report_obj.put("general_message", msg);
 			System.out.print(report_obj);
