@@ -25,6 +25,8 @@ public class StructTree {
 	static Map<String, Object> role_map;
 
 	static List<PDPage> pages;
+	static Integer pages_seen = 0;
+	static Set<Integer> curr_page_img_mcids;
 	
 	/**
 	 * Constructor
@@ -61,15 +63,23 @@ public class StructTree {
 		String key = (dict.containsKey("Nums")) ? "Nums" : "Kids";
 		COSArray kids = (COSArray) dict.getItem(key);
 		
-		int pages_seen = 0;
-		List<Object> figures = new ArrayList<Object>();
+		Map<Integer, List> figures = new HashMap<Integer, List>();
 		Map<String, Integer> headings = new HashMap<String, Integer>();
 		for (int i=0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
+				try {
+					curr_page_img_mcids = (new ParseContentStream(pages.get(pages_seen))).getImageMCIDs();
+					System.out.println(curr_page_img_mcids);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					curr_page_img_mcids = new HashSet<Integer>();
+				}
+				
 				COSArray elem = (COSArray) kid;
 				for (int j=0; j < elem.size(); j++) {
-					processElement(elem.get(j), pages_seen, figures, headings);
+					processElement(elem.get(j),figures, headings);
 				}
 				pages_seen++;
 			}
@@ -146,26 +156,35 @@ public class StructTree {
 	 * @param figures
 	 * @param headings
 	 */
-	public static void processElement( COSBase elem, Integer pages_seen, List<Object> figures, Map<String, Integer> headings ) {
+	public static void processElement( COSBase elem, Map<Integer, List> figures, Map<String, Integer> headings ) {
 		elem = resolve(elem);
 		if (elem instanceof COSDictionary) { //PDStructureElement
 			COSDictionary dict = ((COSDictionary) elem);
 			String tag = dict.getNameAsString(COSName.S);
+			
+			Integer mcid;
+			COSBase k_item = resolve(dict.getItem(COSName.K));
+			if (k_item instanceof COSInteger) {
+				mcid = ((COSInteger)k_item).intValue();
+			} else { //An array
+				mcid = filterInts(((COSArray) k_item).toList());
+			}
 			if (tag != null) {
-				if (isFigure(tag)) {
+				if (isFigure(tag) | curr_page_img_mcids.contains(mcid)) {
 					Map<String, Object> figure_dict = new HashMap<String, Object>();
-					figure_dict.put("Alt", dict.getString(COSName.ALT));
-					figure_dict.put("Page", pages_seen);
-					
-					Integer mcid;
-					COSBase k_item = resolve(dict.getItem(COSName.K));
-					if (k_item instanceof COSInteger) {
-						mcid = ((COSInteger)k_item).intValue();
-					} else { //An array
-						mcid = filterInts(((COSArray) k_item).toList());
-					}
+					figure_dict.put("Alt", dict.getString(COSName.ALT, "None"));
 					figure_dict.put("MCID", mcid);
-					figures.add(figure_dict);
+					if (!isFigure(tag)) { //yet the image is marked in the content stream
+						figure_dict.put("Warning",
+							String.format("This image is marked as a %s "
+									+ "rather than a Figure.", tag));
+					}
+					List figure_objs = figures.get(pages_seen);
+					if (figure_objs == null) {
+						figure_objs = new ArrayList();
+					}
+					figure_objs.add(figure_dict);
+					figures.put(pages_seen, figure_objs);
 				} else if (isHeading(tag)) {
 					Integer count = headings.get(tag);
 					headings.put(tag, (count == null)? 1 : count + 1);

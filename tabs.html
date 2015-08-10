@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="col-md-3">
+	<div class="col-md-4">
 	<select class="form-control" id="files">
 	{% for filename in data.filenames %}
 		<option 
@@ -8,7 +8,7 @@
 	{% endfor %}
 	</select>
 	</div>
-	<div class="col-md-6">
+	<div class="col-md-7">
 	<ul class="nav nav-tabs">
 		<li id="main_tab" class="active"><a data-toggle="tab">
 		Amend Accessibility</a></li>
@@ -23,7 +23,7 @@
 		var results = url.match(re);
 		//remembered substring, holding the id of the file
 		var id = results[results.length - 1];
-		document.getElementById("tagged_tab").href = "/download/" + id;
+		//document.getElementById("tag_tab").href = "/download/" + id;
 	</script>
 	</ul>
 	</div>

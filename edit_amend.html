@@ -1,4 +1,4 @@
-<div class="col-md-3">
+<div class="col-md-4">
 	<div id="action_wizard" class="panel-group" style="overflow:scroll;height:530px;">
 	<div class="panel panel-info">
 	<div class="panel-heading task_headings">
@@ -6,33 +6,49 @@
 	</div>
 		<div class="panel-body task_panel" id="task_panel_0" >
 		<ul style="padding-left:15px;">
-			<li>Tagged PDF: <b>{{ data.output.tagged_bool }}</b></li>
+			<li id="tagged_bool">
+			Tagged PDF: <b>{{ data.output.tagged_bool }}</b>
+			<div class="well well-sm">
+			This signifies that a Structure Tree exists within your document. 
+			</div>
+			</li>
 			{% set tags_info = data.output.tags_info %}
 			{% if data.output.tagged_bool %}
 				{% set headings = tags_info.headings %}
-				{% if headings %}
-					<li><ul>
+				{% if headings != {} %}
+					<li>Headings Count:
+					<ul>
 					{% for heading in headings | sort %}
 						<li>{{ heading }}: {{ headings[heading] }}</li>
 					{% endfor %}
 					</ul></li>
+				{% else %}
+					<li>Need to add headings to your PDF</li>
 				{% endif %}
 				
-				{% set figures = tags_info.figures %}
-				{% if figures %}
+				{% set figures = tags_info.figures  %}
+				{% if figures[0] %}
 					<li><ul>
 					{% for figure in figures %}
+						
 						<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
+						{% endif %}
 					{% endfor %}
 					</ul></li>
 				{% endif %}
 			{% endif %}
+			<li><div class="well wll-sm">
+				If you would like to edit the document structure, here's  
+				<a href="https://helpx.adobe.com/acrobat/using/editing-document-structure-content-tags.html">how to do so</a>.
+			</div></li>
 			<li>Language assigned to document: <b>{{ data.output.language }}</b>
 				<div class="well well-sm">
 					It's important for screen readers to know which 
 					language they are reading in. If the major language 
 					of the document is not in this list, follow this link 
-					to get the proper <a href="http://www-01.sil.org/iso639-3/codes.asp?order=639_3&letter=a">ISO code</a> for the language.
+					to get the proper <a href="http://www-01.sil.org/iso639-3/codes.asp?order=639_3&letter=a">ISO code</a> for the language. 
+					<br> Finally, go to <a href="https://helpx.adobe.com/acrobat/using/pdf-properties-metadata.html#view_document_properties">here</a> 
+					to learn how to edit the main language of the document.
 				</div>
 			</li>
 		</ul>
@@ -49,19 +65,22 @@
 		<br><u>Subject:</u> <span class="prop_text" ng-bind="subject"></span>
 		<br><u>Keywords:</u> <span class="prop_text" ng-bind="keywords"></span>
 		<br>
+		<br>
 		<!--<center>
 		<button id="edit_prop_btn" class="btn" style="margin-bottom:5px;">Edit Properties</center></button>
 		-->
-		<div class="well well-sm">Make sure the description 
-		does an adequate job of describing the image. 
-		If need be longer create a footnote for the image.</div>
+		<div class="well well-sm">If none of these coincide with
+		the document's actual properties, go to 
+		<a href="https://helpx.adobe.com/acrobat/using/pdf-properties-metadata.html#view_document_properties">this link</a>
+		for directions on how to edit it.
+		</div>
 		</div>
 	</div>
 	</div>
 </div>
 
-<div class="col-md-6">
-	<ul class="pager" style="margin:5px;">
+<div class="col-md-8">
+	<ul class="pager" style="margin:5px;width:795px;">
 		<li class="previous" id="prev"><a>Previous</a></li>
 		<li><span>Page: <span id="page_num"></span> / <span id="page_count"></span></span></li>
 		<li class="next" id="next"><a>Next</a></li>
@@ -69,6 +88,6 @@
 		
 	<canvas id="the-canvas" style="border:1px solid black;height:1029px;width:795px;"></canvas>
 </div>
-<div class="col-md-3">
-</div>
+<!--<div class="col-md-3">
+</div>-->
 <div class="clearfix visible-lg"></div>

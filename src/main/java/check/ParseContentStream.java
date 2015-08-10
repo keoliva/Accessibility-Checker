@@ -1,13 +1,17 @@
 package check;
 
 import java.awt.geom.AffineTransform;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +50,8 @@ public class ParseContentStream extends PDFStreamEngine {
 	static float max = 0.0f;
 	//static StringBuilder max_str = new StringBuilder();
 	
+	static PDPage curr_page;
+	
 	public class TextPositionCompartor implements Comparator {
 		@Override
 		public int compare(Object t1, Object t2) {
@@ -56,28 +62,95 @@ public class ParseContentStream extends PDFStreamEngine {
 	public ParseContentStream( PDPage page ) throws IOException {
 		super( ResourceLoader.loadProperties(
                 "org/apache/pdfbox/resources/PDFTextStripper.properties", true ) );
+		curr_page = page;
+	}
+	
+	/**
+	 * converts an InputStream object to a String object
+	 * @author Summer Kitahara
+	 * @param is the input stream
+	 * @return the string version of the input stream
+	 * @throws IOException
+	 */
+	public static String inputStreamToString( InputStream is ) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder out = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            out.append(line);
+        }
+        reader.close();
+        return out.toString();
+	}
+	
+	/**
+	 * parses page for the "Do" operator which signifies that an image is being painted
+	 * @author Summer Kitahara
+	 * @return a set of all the marked content IDs of the marked images in the content 
+	 * stream
+	 */
+	public Set<Integer> getImageMCIDs() {
+		try {
+			InputStream is = curr_page.getContents().createInputStream();
+			Set<Integer> result = new HashSet<Integer>();
+			String input = inputStreamToString(is);
+			int i = 0;
+			while(i < input.length()) {
+				int _do = input.substring(i).indexOf("Do");
+				if(_do >= 0) {
+					//found a "Do"
+					_do += i;
+					int bdc = input.substring(i, _do).lastIndexOf("BDC")+i;
+					int mcid = input.substring(i, bdc).lastIndexOf("MCID");
+					if(mcid >= 0) {
+						System.out.println(mcid);
+						//found MCID and add it to list
+						mcid += i;
+						String id = input.substring(mcid + 5, input.substring(i, _do).lastIndexOf(">>")+i);
+						result.add(Integer.parseInt(id));
+					}
+					
+					//incrementing i
+					int next_bdc = input.substring(_do).indexOf("BDC")+_do;
+					int emc = input.substring(_do).indexOf("EMC")+_do;
+					if(next_bdc < emc) {
+						//nested bdc's/emc's
+						i = _do+2;
+					}
+					else {
+						//not nested 
+						i = emc+3;
+					}
+				}
+				else {
+					//no "Do"
+					i = input.length();
+				}
+			}
+			return result;
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new HashSet<Integer>();
 	}
 	
 	@Override
 	protected void processTextPosition( TextPosition text ) {
 		float tx = text.getX();
 		float ty = text.getY();
-		//System.out.println(String.format("(%s, %s): %s", tx, ty, text.getCharacter()));
-		//System.out.println(String.format("(%s, %s): %s", text.getXDirAdj(), text.getYDirAdj(), text.getCharacter()));
 		PriorityQueue<TextPosition> positions = areas.get(ty);
-		//StringBuilder positions = areas.get(ty);
+
 		if (positions == null) {
 			positions = new PriorityQueue<TextPosition>(10, new TextPositionComparator());
 			positions.add(text);
-			//positions = new StringBuilder();
-			//positions.append(text.getCharacter());
+
 			areas.put(ty, positions);
 		} else {
 			positions.add(text);
-			//positions.append(text.getCharacter());
 			areas.put(ty, positions);
 		}
-		//System.out.println(text.toString());
 		if (text.getFontSizeInPt() > max) {
 			max = text.getFontSizeInPt();
 		}

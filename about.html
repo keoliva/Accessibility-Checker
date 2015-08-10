@@ -10,6 +10,32 @@
 {% endblock nav %}
 {% block content %}
   <div class="container">
-  <h1>Files Have Been Downloaded</h1>
+  <h1>About</h1>
+  This does a basic check on the accessibility of the PDFs uploaded. This includes :
+  <ul>
+	<li>Whether or not the document is marked as a "Tagged PDF"</li>
+	<li>Counts the different type of heading tags marked in the document</li>
+	<li>Marks whether or not any content tagged as a 'Figure' has 
+	alternative-text</li>
+	<li>Whether or not the document has a main document language 
+	specified</li>
+  </ul>
+
+  <h4>Structure Tree</h4>
+  It is within this structure that the logical structure or the 
+  hierarchy of tagged content of the document is held. Based of its existence, 
+  I know whether or not for sure if the document is tagged. I traverse 
+  this structure to find tags for headings and figures.
+  
+  <h4>Document Properties</h4>
+  There are basic properties of documents that should be set. 
+  <ul>
+	<li>Title</li>
+	<li>Author</li>
+	<li>Keywords</li>
+	<li>Subject</li>
+  </ul>
+  Sometimes, whatever software created the document has to guess what the 
+  values of these properties are.
   </div>
 {% endblock content %}
