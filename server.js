@@ -61,7 +61,6 @@ app.get('/download/:id', function (req, res) {
 app.route('/edit/:id')
 	.get(function (req, res) {
 		var id = parseInt(req.params.id);
-
 		var doc_data = {
 			filenames: filenames,
 			curr_file_index: id,

@@ -6,6 +6,8 @@
   <script src="/static/js/pdf.js"></script>
   <script src="/static/js/pdf.worker.js"></script>
   <script src="/static/js/display_pdf.js"></script>
+  <script src="/static/js/CollapsibleLists.js"></script>
+
   <script src="/static/js/text_layer_builder.js"></script>
   <script>
   var app = angular.module('prop_app', []);
@@ -36,6 +38,8 @@
 		//remembered substring, holding the id of the file
 		var id = results[results.length - 1];
 		display_pdf('/download/'+id);
+		
+		
 		</script>
 	</div>
 	

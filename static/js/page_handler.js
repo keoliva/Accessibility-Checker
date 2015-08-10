@@ -1,4 +1,8 @@
 $(function() {
+	$(document).ready(function() {
+		CollapsibleLists.applyTo(document.getElementById('figures_list'));
+	});
+	
 	$('.panel').click(function(){
 		$(this).children('.panel-body').slideDown();
 		$('.panel').not(this).each(function() {

@@ -103,7 +103,6 @@ public class ParseContentStream extends PDFStreamEngine {
 					int bdc = input.substring(i, _do).lastIndexOf("BDC")+i;
 					int mcid = input.substring(i, bdc).lastIndexOf("MCID");
 					if(mcid >= 0) {
-						System.out.println(mcid);
 						//found MCID and add it to list
 						mcid += i;
 						String id = input.substring(mcid + 5, input.substring(i, _do).lastIndexOf(">>")+i);

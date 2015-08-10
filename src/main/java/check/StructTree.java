@@ -70,7 +70,6 @@ public class StructTree {
 			if (kid instanceof COSArray) {//represents a page
 				try {
 					curr_page_img_mcids = (new ParseContentStream(pages.get(pages_seen))).getImageMCIDs();
-					System.out.println(curr_page_img_mcids);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -179,12 +178,12 @@ public class StructTree {
 							String.format("This image is marked as a %s "
 									+ "rather than a Figure.", tag));
 					}
-					List figure_objs = figures.get(pages_seen);
+					List figure_objs = figures.get(pages_seen + 1);
 					if (figure_objs == null) {
 						figure_objs = new ArrayList();
 					}
 					figure_objs.add(figure_dict);
-					figures.put(pages_seen, figure_objs);
+					figures.put(pages_seen + 1, figure_objs);
 				} else if (isHeading(tag)) {
 					Integer count = headings.get(tag);
 					headings.put(tag, (count == null)? 1 : count + 1);

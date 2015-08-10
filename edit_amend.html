@@ -15,7 +15,7 @@
 			{% set tags_info = data.output.tags_info %}
 			{% if data.output.tagged_bool %}
 				{% set headings = tags_info.headings %}
-				{% if headings != {} %}
+				{% if headings %}
 					<li>Headings Count:
 					<ul>
 					{% for heading in headings | sort %}
@@ -27,20 +27,38 @@
 				{% endif %}
 				
 				{% set figures = tags_info.figures  %}
-				{% if figures[0] %}
-					<li><ul>
-					{% for figure in figures %}
-						
-						<li>Page: {{ figure.Page }} MCID: {{ figure.MCID}} Alt-Text: {{ figure.Alt }}</li>
-						{% endif %}
+				{% if figures %}
+					<li>Figures: <ul class="collapsibleList" id="figures_list">
+					{% for key,figure_arr in figures %}
+						<li>Page {{ key }}
+							<ul>{% for figure in figure_arr %}
+								<li>MCID: {{ figure.MCID }}</li>
+								{% if figure.Warning %}
+								<li>Warning: {{ figure.Warning }}</li>
+								{% endif %}
+								{% if figure.Alt == "None" %}
+								<li>Alt: None</li>
+								{% else %}
+								<li>Alt <ul>
+										<li>{{ figure.Alt }}</li>
+										</ul></li>
+								{% endif %}{% endfor %}
+							</ul></li>
 					{% endfor %}
 					</ul></li>
 				{% endif %}
 			{% endif %}
-			<li><div class="well wll-sm">
-				If you would like to edit the document structure, here's  
+			<li>
+				<div class="well wll-sm">
+				If you would like to edit the document structure such as changing a tag, here's  
 				<a href="https://helpx.adobe.com/acrobat/using/editing-document-structure-content-tags.html">how to do so</a>.
-			</div></li>
+				<br>
+				To add or edit an image's alternative text, go 
+				<a href="http://www.adobe.com/accessibility/products/indesign/alt-text.html">here</a>.
+				 Or you could so when you come across an element with a Figure tag when 
+				 parsing the document structure, using the directions above.
+				</div>
+			</li>
 			<li>Language assigned to document: <b>{{ data.output.language }}</b>
 				<div class="well well-sm">
 					It's important for screen readers to know which 
