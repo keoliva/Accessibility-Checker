@@ -65,24 +65,6 @@ public class ParseContentStream extends PDFStreamEngine {
 	}
 	
 	/**
-	 * converts an InputStream object to a String object
-	 * @author Summer Kitahara
-	 * @param is the input stream
-	 * @return the string version of the input stream
-	 * @throws IOException
-	 */
-	public static String inputStreamToString( InputStream is ) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder out = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            out.append(line);
-        }
-        reader.close();
-        return out.toString();
-	}
-	
-	/**
 	 * parses page for the "Do" operator which signifies that an image is being painted
 	 * @author Summer Kitahara
 	 * @return a set of all the marked content IDs of the marked images in the content 
@@ -99,11 +81,12 @@ public class ParseContentStream extends PDFStreamEngine {
 				if (obj instanceof PDFOperator) {
 					String operation = ((PDFOperator) obj).getOperation();
 					switch( operation ) {
-						case "Do"://An image is being painted
+						case "Do"://An image is being painted, refers to indirect reference to an image
+						case "BI"://Refers to an inline image
 						case "BDC"://Beginning of marked content with a properties list as an operand
 						case "EMC"://Ending of marked content
 							all_indices.add(i);
-							if (operation.equals("Do")) {
+							if (operation.equals("Do") | operation.equals("BI")) {
 								//pointer is next to the operator before this Do
 								op_iterator = all_indices.listIterator(all_indices.size()-1);
 								if (op_iterator.hasPrevious()) {
