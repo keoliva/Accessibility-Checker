@@ -15,12 +15,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSBase;
@@ -88,43 +90,40 @@ public class ParseContentStream extends PDFStreamEngine {
 	 */
 	public Set<Integer> getImageMCIDs() {
 		try {
-			InputStream is = curr_page.getContents().createInputStream();
-			Set<Integer> result = new HashSet<Integer>();
-			String input = inputStreamToString(is);
-			int i = 0;
-			while(i < input.length()) {
-				int _do = input.substring(i).indexOf("Do");
-				if(_do >= 0) {
-					//found a "Do"
-					_do += i;
-					int bdc = input.substring(i, _do).lastIndexOf("BDC")+i;
-					int mcid = input.substring(i, bdc).lastIndexOf("MCID");
-					if(mcid >= 0) {
-						//found MCID and add it to list
-						mcid += i;
-						String id = input.substring(mcid + 5, input.substring(i, _do).lastIndexOf(">>")+i);
-						result.add(Integer.parseInt(id));
-					}
-					
-					//incrementing i
-					int next_bdc = input.substring(_do).indexOf("BDC")+_do;
-					int emc = input.substring(_do).indexOf("EMC")+_do;
-					if(next_bdc < emc) {
-						//nested bdc's/emc's
-						i = _do+2;
-					}
-					else {
-						//not nested 
-						i = emc+3;
+			List<Object> tokens = curr_page.getContents().getStream().getStreamTokens();
+			Set<Integer> mcids = new HashSet<Integer>();
+			List<Integer> all_indices = new ArrayList<Integer>();
+			int i = 0; ListIterator<Integer> op_iterator;;
+			for (Iterator<Object> iter = tokens.iterator(); iter.hasNext();) {
+				Object obj = iter.next();
+				if (obj instanceof PDFOperator) {
+					String operation = ((PDFOperator) obj).getOperation();
+					switch( operation ) {
+						case "Do"://An image is being painted
+						case "BDC"://Beginning of marked content with a properties list as an operand
+						case "EMC"://Ending of marked content
+							all_indices.add(i);
+							if (operation.equals("Do")) {
+								//pointer is next to the operator before this Do
+								op_iterator = all_indices.listIterator(all_indices.size()-1);
+								if (op_iterator.hasPrevious()) {
+									int prev_i = op_iterator.previous();
+									String prev_op = ((PDFOperator) tokens.get(prev_i)).getOperation();
+									
+									if (prev_op.equals("BDC")) {
+										//the operand of BDC is a COSDictionary
+										int mcid = ((COSDictionary) tokens.get(prev_i-1)).getInt(COSName.MCID);
+										if (mcid >= 0) mcids.add(mcid);
+									}
+								}
+							}
+							break;
+						default: break;
 					}
 				}
-				else {
-					//no "Do"
-					i = input.length();
-				}
+				i++;
 			}
-			return result;
-
+			return mcids;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -195,15 +194,17 @@ public class ParseContentStream extends PDFStreamEngine {
 	
 	public static void main(String[] args) throws IOException { 
 		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
-		String filename = "CHI2016ProceedingsFormat.pdf";
+		String filename = "socialmicrovolunteering.pdf";
         PDDocument document = PDDocument.load(filename);
         List doc_pages = document.getDocumentCatalog().getAllPages();
         PDPage pg;
 		for (int i = 0; i < doc_pages.size(); ++i) {
 			pg = (PDPage) doc_pages.get(i);
 			ParseContentStream parser = new ParseContentStream(pg);
+			System.out.println("Page "+ i);
+			System.out.println(parser.getImageMCIDs());
 			//PDFTextStripper stripper = new PDFTextStripper();
-			parser.processStream(pg, pg.getResources(), pg.getContents().getStream());
+			/**parser.processStream(pg, pg.getResources(), pg.getContents().getStream());
 			System.out.println("Page: " + i);
 			//System.out.println(areas);
 			//System.out.println();
@@ -220,7 +221,8 @@ public class ParseContentStream extends PDFStreamEngine {
 			System.out.println(max);
 			areas = new TreeMap<Float, PriorityQueue>();
 			//areas = new TreeMap<Float, StringBuilder>();
-			break;
+			break;*/
+			
 		}
 		/**try {
 			String filename = "CHI2016ProceedingsFormat.pdf";

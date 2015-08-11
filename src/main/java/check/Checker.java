@@ -32,6 +32,9 @@ public class Checker {
 	private static List<PDPage> pages;
 	private static boolean changes_made = false;
 	
+	private static boolean tagged;
+	private static String main_lang;
+	
 	/**
 	 * Constructor 
 	 * @param filename of the document whose accessibility report will be 
@@ -72,8 +75,11 @@ public class Checker {
 	private String displayMainLanguage() {
 		try {
 			COSDictionary root_dict = root.getCOSDictionary();
-			return root_dict.getString(COSName.LANG, "None");
+			String lang = root_dict.getString(COSName.LANG, "None");
+			main_lang = lang;
+			return lang;
 		} catch ( Exception e ) { //root is null
+			main_lang = "None";
 			return "None";
 		}
 	}
@@ -96,6 +102,7 @@ public class Checker {
 					
 					changes_made = true;
 				}
+				tagged = true;
 				return true;
 			} else {//officially unmarked
 				if (marked_bool) {
@@ -104,43 +111,52 @@ public class Checker {
 					
 					changes_made = true;
 				}
+				tagged = false;
 				return false;
 			}
 		} catch ( Exception e ) { //root is null
+			tagged = false;
 			return false;
 		}
 		
 	}
+	
+	/**
+	 * @return a general message about how the check went, for the accessibility 
+	 * of the document
+	 */
+	private Map<String, String> getGeneralMessage() {
+		Map<String, String> msg = new HashMap<String, String>();
+		if (!tagged)  
+			msg.put("danger", "Your document is not tagged.");
+		else if (main_lang == "None" | stree.figures_warning_on | 
+				stree.headings_warning_on)
+			msg.put("warning", "There are some problems you'll want to fix.");
+		else //at least tagged
+			msg.put("success", "Things look good.");
+
+		return msg;
+	}
 
 	public static void main(String[] args) throws IOException, COSVisitorException {
+		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
+		//String filename = "socialmicrovolunteering.pdf";
 		String filename;
 		for (int i=0; i < args.length; i++) {
 			filename = args[i];
 			JSONObject report_obj = new JSONObject();
 			Checker report = new Checker(filename);
 			report_obj.put("properties", report.displayDocInfo());
-			String main_lang = report.displayMainLanguage();
-			report_obj.put("language", main_lang);
-			boolean tagged = report.displayTaggedBool();
-			report_obj.put("tagged_bool", tagged);
+			report_obj.put("language", report.displayMainLanguage());
+			report_obj.put("tagged_bool", report.displayTaggedBool());
 			
 			try {
 				report_obj.put("tags_info", stree.traverseParentTree());
 			} catch ( Exception e ) { //root is null
 				report_obj.put("tags_info", new HashMap());
 			}
-			Map<String, String> msg = new HashMap<String, String>();
-			
-			if (main_lang == "None" | stree.figures_warning_on | 
-					stree.headings_warning_on) {
-				msg.put("warning", "There are some problems you'll want to fix.");
-				
-			} else if (!tagged) {
-				msg.put("danger", "Your document is not tagged.");
-			} else { //at least tagged
-				msg.put("success", "Things look good.");
-			}
-			report_obj.put("general_message", msg);
+	
+			report_obj.put("general_message", report.getGeneralMessage());
 			System.out.print(report_obj);
 		}
 	}

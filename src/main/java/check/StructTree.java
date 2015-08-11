@@ -18,8 +18,6 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.*;
 import org.apache.pdfbox.pdmodel.markedcontent.PDPropertyList;
 import org.apache.pdfbox.util.PDFOperator;
 
-
-
 public class StructTree {
 	PDStructureTreeRoot st_root;
 	static Map<String, Object> role_map;
@@ -68,7 +66,7 @@ public class StructTree {
 		String key = (dict.containsKey("Nums")) ? "Nums" : "Kids";
 		COSArray kids = (COSArray) dict.getItem(key);
 		
-		Map<Integer, List> figures = new HashMap<Integer, List>();
+		Map<Integer, Set> figures = new HashMap<Integer, Set>();
 		Map<String, Integer> headings = new HashMap<String, Integer>();
 		for (int i=0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
@@ -80,7 +78,6 @@ public class StructTree {
 					e.printStackTrace();
 					curr_page_img_mcids = new HashSet<Integer>();
 				}
-				
 				COSArray elem = (COSArray) kid;
 				for (int j=0; j < elem.size(); j++) {
 					processElement(elem.get(j),figures, headings);
@@ -164,7 +161,7 @@ public class StructTree {
 	 * @param figures
 	 * @param headings
 	 */
-	public static void processElement( COSBase elem, Map<Integer, List> figures, Map<String, Integer> headings ) {
+	public static void processElement( COSBase elem, Map<Integer, Set> figures, Map<String, Integer> headings ) {
 		elem = resolve(elem);
 		if (elem instanceof COSDictionary) { //PDStructureElement
 			COSDictionary dict = ((COSDictionary) elem);
@@ -178,7 +175,7 @@ public class StructTree {
 				mcid = filterInts(((COSArray) k_item).toList());
 			}
 			if (tag != null) {
-				if (isFigure(tag) | curr_page_img_mcids.contains(mcid)) {
+				if (isFigure(tag) && curr_page_img_mcids.contains(mcid)) {
 					Map<String, Object> figure_dict = new HashMap<String, Object>();
 					figure_dict.put("Alt", dict.getString(COSName.ALT, "None"));
 					figure_dict.put("MCID", mcid);
@@ -188,9 +185,9 @@ public class StructTree {
 									+ "rather than a Figure.", tag));
 						figures_warning_on = true;
 					}
-					List figure_objs = figures.get(pages_seen + 1);
+					Set figure_objs = figures.get(pages_seen + 1);
 					if (figure_objs == null) {
-						figure_objs = new ArrayList();
+						figure_objs = new HashSet();
 					}
 					figure_objs.add(figure_dict);
 					figures.put(pages_seen + 1, figure_objs);
