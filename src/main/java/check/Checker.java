@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.simple.JSONObject;
+import org.apache.jempbox.xmp.XMPMetadata;
+import org.apache.jempbox.xmp.XMPSchemaDublinCore;
+import org.apache.jempbox.xmp.XMPSchemaPDF;
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.exceptions.COSVisitorException;
@@ -27,9 +30,10 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
  */
 public class Checker {
 	public static PDDocument document;
-	private static PDDocumentCatalog root;
-	private static StructTree stree;
-	private static List<PDPage> pages;
+	private static String target;
+	public static PDDocumentCatalog root;
+	public static StructTree stree;
+	public static List<PDPage> pages;
 	private static boolean changes_made = false;
 	
 	private static boolean tagged;
@@ -42,6 +46,7 @@ public class Checker {
 	 * @throws IOException
 	 */
 	public Checker( String filename ) throws IOException {
+		target = filename;
 		document = PDDocument.load(filename);
 		root = document.getDocumentCatalog();
 		pages = root.getAllPages();
@@ -56,8 +61,8 @@ public class Checker {
 	 */
 	private Map<String, String> displayDocInfo() {
 		COSDictionary docInfo = document.getDocumentInformation().getDictionary();
-		
 		Map<String, String> properties = new HashMap<String, String>();
+		
 		try {
 			properties.put("title", docInfo.getString(COSName.TITLE, ""));
 			properties.put("author", docInfo.getString(COSName.AUTHOR, ""));
@@ -137,6 +142,23 @@ public class Checker {
 
 		return msg;
 	}
+	
+	/**
+	 * saves the document if changes were made, then finally closes it
+	 * @throws IOException
+	 */
+	public void closeDocument() throws IOException {
+		try {
+			if (changes_made) {
+				System.out.println("we in here");
+				document.save(target);
+			}
+		} catch (Exception e) {
+			
+		} finally {
+			document.close();
+		}
+	}
 
 	public static void main(String[] args) throws IOException, COSVisitorException {
 		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
@@ -157,6 +179,8 @@ public class Checker {
 			}
 	
 			report_obj.put("general_message", report.getGeneralMessage());
+			
+			report.closeDocument();
 			System.out.print(report_obj);
 		}
 	}
