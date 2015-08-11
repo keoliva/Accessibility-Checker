@@ -175,7 +175,7 @@ public class StructTree {
 				mcid = filterInts(((COSArray) k_item).toList());
 			}
 			if (tag != null) {
-				if (isFigure(tag) && curr_page_img_mcids.contains(mcid)) {
+				if (curr_page_img_mcids.contains(mcid)) {
 					Map<String, Object> figure_dict = new HashMap<String, Object>();
 					figure_dict.put("Alt", dict.getString(COSName.ALT, "None"));
 					figure_dict.put("MCID", mcid);
