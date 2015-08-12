@@ -35,6 +35,7 @@ public class Checker {
 	public static StructTree stree;
 	public static List<PDPage> pages;
 	private static boolean changes_made = false;
+	private static boolean changes_made_to_docinfo;
 	
 	private static boolean tagged;
 	private static String main_lang;
@@ -59,19 +60,11 @@ public class Checker {
 	 * XMP format
 	 * @return important fields in the metadata
 	 */
-	private Map<String, String> displayDocInfo() {
-		COSDictionary docInfo = document.getDocumentInformation().getDictionary();
-		Map<String, String> properties = new HashMap<String, String>();
-		
-		try {
-			properties.put("title", docInfo.getString(COSName.TITLE, ""));
-			properties.put("author", docInfo.getString(COSName.AUTHOR, ""));
-			properties.put("subject", docInfo.getString(COSName.SUBJECT, ""));
-			properties.put("keywords", docInfo.getString(COSName.KEYWORDS, ""));
-		} catch ( Exception e ) { //root is null
-			return properties;
-		}
-		return properties;
+	private Map<String, Object> displayDocInfo() {
+		Map<String, Object> prop = new ResolveMetadata(this).getProperties();
+		if (prop.containsKey("changes_made"))
+			changes_made = true;
+		return prop;
 	}
 	
 	/**
@@ -150,7 +143,6 @@ public class Checker {
 	public void closeDocument() throws IOException {
 		try {
 			if (changes_made) {
-				System.out.println("we in here");
 				document.save(target);
 			}
 		} catch (Exception e) {
