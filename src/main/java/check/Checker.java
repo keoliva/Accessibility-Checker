@@ -60,7 +60,7 @@ public class Checker {
 	 * XMP format
 	 * @return important fields in the metadata
 	 */
-	private Map<String, Object> displayDocInfo() {
+	public Map<String, Object> displayDocInfo() {
 		Map<String, Object> prop = new ResolveMetadata(this).getProperties();
 		if (prop.containsKey("changes_made"))
 			changes_made = true;
