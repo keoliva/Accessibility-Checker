@@ -65,53 +65,63 @@ public class ParseContentStream extends PDFStreamEngine {
 	}
 	
 	/**
-	 * parses page for the "Do" operator which signifies that an image is being painted
 	 * @author Summer Kitahara
-	 * @return a set of all the marked content IDs of the marked images in the content 
-	 * stream
+	 * @return a map with two values. One of them being a set of all the marked content IDs of 
+	 * the marked images in the content as well as a set with all marked content ids for any 
+	 * type of content
 	 */
-	public Set<Integer> getImageMCIDs() {
+	public Map<String, Set> getMCIDs() {
+		Map<String, Set> result = new HashMap<String, Set>();
 		try {
 			List<Object> tokens = curr_page.getContents().getStream().getStreamTokens();
-			Set<Integer> mcids = new HashSet<Integer>();
-			List<Integer> all_indices = new ArrayList<Integer>();
-			int i = 0; ListIterator<Integer> op_iterator;;
-			for (Iterator<Object> iter = tokens.iterator(); iter.hasNext();) {
-				Object obj = iter.next();
+			Set<Integer> all_mcids = new HashSet<Integer>();
+			Set<Integer> img_mcids = new HashSet<Integer>();
+			List<Integer> indices = new ArrayList<Integer>();
+			ListIterator<Integer> op_iterator; boolean find_lines = true;
+			for (int i = 0; i < tokens.size(); i++) {
+				Object obj = tokens.get(i);
 				if (obj instanceof PDFOperator) {
 					String operation = ((PDFOperator) obj).getOperation();
 					switch( operation ) {
+						case "l":
 						case "Do"://An image is being painted, refers to indirect reference to an image
 						case "BI"://Refers to an inline image
 						case "BDC"://Beginning of marked content with a properties list as an operand
+						case "DP"://also marks content and has a properties list as an operand
 						case "EMC"://Ending of marked content
-							all_indices.add(i);
-							if (operation.equals("Do") | operation.equals("BI")) {
+							indices.add(i);
+							if (operation.equals("Do") | operation.equals("BI") | operation.equals("l")) {
+								if (operation.equals("l")) {
+									if (!find_lines) continue;
+									else find_lines = false;
+								}
 								//pointer is next to the operator before this Do
-								op_iterator = all_indices.listIterator(all_indices.size()-1);
+								op_iterator = indices.listIterator(indices.size()-1);
 								if (op_iterator.hasPrevious()) {
 									int prev_i = op_iterator.previous();
 									String prev_op = ((PDFOperator) tokens.get(prev_i)).getOperation();
 									
-									if (prev_op.equals("BDC")) {
+									if (prev_op.equals("BDC") | prev_op.equals("DP")) {
 										//the operand of BDC is a COSDictionary
 										int mcid = ((COSDictionary) tokens.get(prev_i-1)).getInt(COSName.MCID);
-										if (mcid >= 0) mcids.add(mcid);
+										if (mcid >= 0) img_mcids.add(mcid);
 									}
 								}
+							} else if (operation.equals("BDC") | operation.equals("DP")) {
+								int mcid = ((COSDictionary) tokens.get(i-1)).getInt(COSName.MCID);
+								if (mcid >= 0) all_mcids.add(mcid);
 							}
 							break;
 						default: break;
 					}
 				}
-				i++;
 			}
-			return mcids;
+			result.put("all_mcids", all_mcids);
+			result.put("img_mcids", img_mcids);
+			return result;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return result;
 		}
-		return new HashSet<Integer>();
 	}
 	
 	@Override
@@ -181,11 +191,11 @@ public class ParseContentStream extends PDFStreamEngine {
         PDDocument document = PDDocument.load(filename);
         List doc_pages = document.getDocumentCatalog().getAllPages();
         PDPage pg;
-		for (int i = 0; i < doc_pages.size(); ++i) {
-			pg = (PDPage) doc_pages.get(i);
-			ParseContentStream parser = new ParseContentStream(pg);
-			System.out.println("Page "+ i);
-			System.out.println(parser.getImageMCIDs());
+		//for (int i = 0; i < doc_pages.size(); ++i) {
+		pg = (PDPage) doc_pages.get(6);
+		ParseContentStream parser = new ParseContentStream(pg);
+		System.out.println("Page "+ 6);
+		System.out.println(parser.getMCIDs());
 			//PDFTextStripper stripper = new PDFTextStripper();
 			/**parser.processStream(pg, pg.getResources(), pg.getContents().getStream());
 			System.out.println("Page: " + i);
@@ -206,7 +216,7 @@ public class ParseContentStream extends PDFStreamEngine {
 			//areas = new TreeMap<Float, StringBuilder>();
 			break;*/
 			
-		}
+		//}
 		/**try {
 			String filename = "CHI2016ProceedingsFormat.pdf";
 	        PDDocument document = PDDocument.load(filename);
