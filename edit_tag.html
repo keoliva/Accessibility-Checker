@@ -1,3 +1,31 @@
-<h1>Tagged</h1>
-<div class="well well-sm" style="white-space:pre-wrap">{{ tagged_pdf.decode("utf8")|e }}
+<h1>Download Updated</h1>
+{% set orig_prop = data.output.properties.orig_prop %}
+{% if orig_prop == null %}
+Your document originally didn't have XMP Metadata. It was 
+initialized in the automatic check, and updated with any 
+Document Information entries if applicable.
+{% else %}
+Changes were made to your metadata. There are two forms of storing it 
+and in the case that neither the deprecated one (Document Information) nor 
+the more recent one (XMP Metadata) were null, the document information 
+entries for the keys <strong>Title, Author, Subject,</strong> and 
+<strong>Keywords</strong> were replaced with that of the Metadata. 
+The current entries of the Document Information may or may not be 
+different than that of its original.
+<br>
+Here are the original entries of the Document Information. 
+<ul>
+	
+	<li>TITLE : {{ orig_prop["title"] }}</li>
+	<li>AUTHOR : {{ orig_prop["author"] }}</li>
+	<li>SUBJECT : {{ orig_prop["subject"] }}</li>
+	<li>KEYWORDS : {{ orig_prop["keywords"] }}</li>
+</ul>
+If you'd like to change the values in the <a href="https://helpx.adobe.com/acrobat/using/pdf-properties-metadata.html#view_document_properties">
+document information</a> 
+and in the <a href="https://helpx.adobe.com/acrobat/using/pdf-properties-metadata.html#edit_document_metadata">
+metadata</a>. It is highly recommended that 
+both methods of storing metadata hold the same values for the main 
+keys mentioned above.
+(% endif %)
 </div>

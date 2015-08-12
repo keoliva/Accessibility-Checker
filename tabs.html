@@ -12,10 +12,9 @@
 	<ul class="nav nav-tabs">
 		<li id="main_tab" class="active"><a data-toggle="tab">
 		Amend Accessibility</a></li>
-		<!--<li id="tag_tab"><a id="tagged_tab"data-toggle="tab" href="">Download Updated</a></li>
-		-->
-		<!--<li id="dict_tab"><a data-toggle="tab">View Dictionaries</a></li>
-		-->
+		{% if data.output.properties.changes_made %}
+			<li id="tag_tab"><a id="tagged_tab"data-toggle="tab" href="">Download Updated</a></li>
+		{% endif %}
 	<script type="text/javascript">
 		//get the id of the file from url
 		var re = /[/](\d*$)/;
@@ -23,7 +22,7 @@
 		var results = url.match(re);
 		//remembered substring, holding the id of the file
 		var id = results[results.length - 1];
-		//document.getElementById("tag_tab").href = "/download/" + id;
+		document.getElementById("tagged_tab").href = "/download/" + id;
 	</script>
 	</ul>
 	</div>

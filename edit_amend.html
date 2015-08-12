@@ -126,14 +126,19 @@
 </div>
 
 <div class="col-md-8">
+	<div id="amend_access" class="row active_content">
 	<ul class="pager" style="margin:5px;width:795px;">
 		<li class="previous" id="prev"><a>Previous</a></li>
 		<li><span>Page: <span id="page_num"></span> / <span id="page_count"></span></span></li>
 		<li class="next" id="next"><a>Next</a></li>
 	</ul>
-		
 	<canvas id="the-canvas" style="border:1px solid black;height:1029px;width:795px;"></canvas>
-</div>
+	</div>
+	
+	<div id="tag" style="padding:30px;">
+		{% include "edit_tag.html" with data.output.properties %}
+	</div>
+	</div>
 <!--<div class="col-md-3">
 </div>-->
 <div class="clearfix visible-lg"></div>
