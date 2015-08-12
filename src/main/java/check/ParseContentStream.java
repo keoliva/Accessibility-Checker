@@ -50,6 +50,11 @@ public class ParseContentStream extends PDFStreamEngine {
 	static Map<Float, PriorityQueue> areas = new TreeMap<Float, PriorityQueue>();
 	static float max = 0.0f;
 	static PDPage curr_page;
+	Map<String, Operator> map_ops = new HashMap<String, Operator>();
+	
+	public enum Operator {
+		l, Do, BI, BDC, DP, EMC, OTHER;
+	}
 	
 	public class TextPositionCompartor implements Comparator {
 		@Override
@@ -62,6 +67,12 @@ public class ParseContentStream extends PDFStreamEngine {
 		super( ResourceLoader.loadProperties(
                 "org/apache/pdfbox/resources/PDFTextStripper.properties", true ) );
 		curr_page = page;
+		map_ops.put("l", Operator.l);
+		map_ops.put("Do", Operator.Do);
+		map_ops.put("BI", Operator.BI);
+		map_ops.put("BDC", Operator.BDC);
+		map_ops.put("DP", Operator.DP);
+		map_ops.put("EMC", Operator.EMC);
 	}
 	
 	/**
@@ -82,13 +93,14 @@ public class ParseContentStream extends PDFStreamEngine {
 				Object obj = tokens.get(i);
 				if (obj instanceof PDFOperator) {
 					String operation = ((PDFOperator) obj).getOperation();
-					switch( operation ) {
-						case "l":
-						case "Do"://An image is being painted, refers to indirect reference to an image
-						case "BI"://Refers to an inline image
-						case "BDC"://Beginning of marked content with a properties list as an operand
-						case "DP"://also marks content and has a properties list as an operand
-						case "EMC"://Ending of marked content
+					Operator op = map_ops.get(operation);
+					switch( op ) {
+						case l:
+						case Do://An image is being painted, refers to indirect reference to an image
+						case BI://Refers to an inline image
+						case BDC://Beginning of marked content with a properties list as an operand
+						case DP://also marks content and has a properties list as an operand
+						case EMC://Ending of marked content
 							indices.add(i);
 							if (operation.equals("Do") | operation.equals("BI") | operation.equals("l")) {
 								if (operation.equals("l")) {
