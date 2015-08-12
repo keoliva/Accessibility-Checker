@@ -105,6 +105,26 @@ public class ResolveMetadata {
 		return result.toString();
 	}
 	
+	private boolean entriesAreNotDifferent(XMPSchemaDublinCore dc, XMPSchemaPDF pdf) {
+		boolean result = false;
+		//check titles
+		if (!document_info.getTitle().toLowerCase().equals(dc.getTitle().toLowerCase()))
+			return false;
+		//check authors
+		String doc_author = document_info.getAuthor().toLowerCase();
+		for (String author : dc.getCreators()) {
+			if (!doc_author.contains(author.toLowerCase()))
+					return false;
+		}
+		//check subject
+		if (!document_info.getSubject().toLowerCase().equals(dc.getDescription().toLowerCase()))
+			return false;
+		//check keywords
+		if (!document_info.getKeywords().toLowerCase().equals(pdf.getKeywords().toLowerCase()))
+			return false;
+		return true;
+	}
+	
 	public void resolve() {	
 		try {
 			XMPMetadata xmp = XMPMetadata.load(metadata.createInputStream());
@@ -130,14 +150,15 @@ public class ResolveMetadata {
 					} catch (Exception e) {
 					}	
 					break;
-				case DocInfoIsNullAndXMPIsNotNull:
 				case DocInfoIsNotNullAndXMPIsNotNull:
+					if (entriesAreNotDifferent(dc, pdf_schema))
+						break;
+				case DocInfoIsNullAndXMPIsNotNull:			
 					document_info.setTitle(dc.getTitle());
 					document_info.setAuthor(join(dc.getCreators(), ", "));
 					document_info.setSubject(dc.getDescription());
 					document_info.setKeywords(pdf_schema.getKeywords());
-					if (status.equals(Status.DocInfoIsNotNullAndXMPIsNotNull))
-						changes_made_to_docinfo = true;
+					changes_made_to_docinfo = true;
 					break;
 				default:
 					break;
