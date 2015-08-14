@@ -24,17 +24,31 @@ app.route('/')
 		});
 		var i = 0;
 		function callback(output) {
-			outputs.push(output);
-			i++;
+			var output_str = output.trim().split("\n");
+			var len = output_str.length;
+			for (var i=0; i < len; i++) {
+				outputs.push(output_str[i]);
+			}
+			console.log(outputs);
+			res.redirect('/edit/0');
+			/**i++;
 			if (i < files.length) {
 				run_cmd();
 			} else {
 				res.redirect('/edit/0');
-			}	
+			}	*/
 		}
 		function run_cmd() {
-			var path = files[i]['path'];
-			var cmd = 'java -cp target/accessibility-0.0.1-SNAPSHOT.jar check/Checker ' + path;
+			//files[i]['path']
+			var paths = "";
+			var len = files.length;
+			paths += files[0]['path'];
+			for (var i = 1; i < len; i++) {
+				paths += " ";
+				paths += files[i]['path'];
+			}
+			console.log(paths);
+			var cmd = 'java -cp target/accessibility-0.0.1-SNAPSHOT.jar check/Checker ' + paths;
 			child_process.exec(cmd,
 			function (err, stdout, stderr) {
 				if (err) {

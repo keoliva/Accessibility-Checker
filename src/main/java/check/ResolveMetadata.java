@@ -97,6 +97,8 @@ public class ResolveMetadata {
 	
 	private String join(List list, String delim) {
 		StringBuilder result = new StringBuilder();
+		if (list == null) 
+			return "";
 		int size = list.size();
 		if (size == 0)
 			return "";
@@ -122,9 +124,16 @@ public class ResolveMetadata {
 			return false;
 		//check authors
 		String doc_author = resolveStr(document_info.getAuthor());
-		for (String author : dc.getCreators()) {
-			if (!doc_author.contains(author.toLowerCase()))
+		List<String> authors = dc.getCreators();
+		if (authors == null) { 
+			if (!doc_author.equals(""))
+				return false;
+		} else {
+			for (String author : authors) {
+				if (!doc_author.contains(author.toLowerCase()))
+					
 					return false;
+			}
 		}
 		//check subject
 		if (!resolveStr(document_info.getSubject()).equals(resolveStr(dc.getDescription())))
@@ -155,7 +164,7 @@ public class ResolveMetadata {
 				xmp.addDublinCoreSchema();
 				xmp.addPDFSchema();
 				dc = xmp.getDublinCoreSchema();
-				pdf_schema = xmp.getPDFSchema();	
+				pdf_schema = xmp.getPDFSchema();
 		}	
 		switch (status) {
 			case DocInfoIsNullAndXMPIsNull:
@@ -188,16 +197,14 @@ public class ResolveMetadata {
 			default:
 				break;
 		}
-		
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String filename = "11_Final_Copy.pdf";
+		new Operators();
+		String filename = "regionspeak.pdf";
         Checker report = new Checker(filename);
-
+        System.out.println(report.stree.traverseParentTree());
         System.out.println(report.displayDocInfo());
         report.closeDocument();
-
-	}
-	
+	}	
 }

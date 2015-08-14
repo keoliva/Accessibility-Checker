@@ -23,7 +23,7 @@ public class StructTree {
 	static Map<String, Object> role_map;
 
 	static List<PDPage> pages;
-	static Integer pages_seen = 0;
+	static Integer pages_seen;
 	static Set<Integer> curr_page_img_mcids;
 	
 	static boolean figures_warning_on = false; //if there's something off with the figures
@@ -38,6 +38,7 @@ public class StructTree {
 	public StructTree( PDStructureTreeRoot root, List<PDPage> doc_pages ) {
 		st_root = root;
 		pages = doc_pages;
+		pages_seen = 0;
 	}
 	
 	/**
@@ -65,7 +66,6 @@ public class StructTree {
 		COSDictionary dict = parent_tree.getCOSDictionary();
 		String key = (dict.containsKey("Nums")) ? "Nums" : "Kids";
 		COSArray kids = (COSArray) dict.getItem(key);
-		
 		Map<Integer, Set> figures = new HashMap<Integer, Set>();
 		Map<String, Integer> headings = new HashMap<String, Integer>();
 		
@@ -75,16 +75,10 @@ public class StructTree {
 		for (int i=0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
-				try {
-					parser = new ParseContentStream(pages.get(pages_seen));
-					mcids = parser.getMCIDs();
-					curr_page_img_mcids = mcids.get("img_mcids");
-					all_mcids = mcids.get("all_mcids");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					curr_page_img_mcids = new HashSet<Integer>();
-				}
+				parser = new ParseContentStream(pages.get(pages_seen));
+				mcids = parser.getMCIDs();
+				curr_page_img_mcids = mcids.get("img_mcids");
+				all_mcids = mcids.get("all_mcids");
 				COSArray elem = (COSArray) kid;
 				for (int j : all_mcids) {
 					processElement(elem.get(j),figures, headings);

@@ -5,6 +5,7 @@ import check.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +30,13 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructur
  *
  */
 public class Checker {
-	public static PDDocument document;
-	private static String target;
-	public static PDDocumentCatalog root;
+	public PDDocument document;
+	private String target;
+	public PDDocumentCatalog root;
 	public static StructTree stree;
-	public static List<PDPage> pages;
-	private static boolean changes_made = false;
-	private static boolean changes_made_to_docinfo;
+	public List<PDPage> pages;
+	private boolean changes_made = false;
+	private boolean changes_made_to_docinfo;
 	
 	private static boolean tagged;
 	private static String main_lang;
@@ -115,8 +116,7 @@ public class Checker {
 		} catch ( Exception e ) { //root is null
 			tagged = false;
 			return false;
-		}
-		
+		}		
 	}
 	
 	/**
@@ -155,25 +155,24 @@ public class Checker {
 	public static void main(String[] args) throws IOException, COSVisitorException {
 		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
 		//String filename = "socialmicrovolunteering.pdf";
+		new Operators();
+		int size = args.length;
 		String filename;
-		for (int i=0; i < args.length; i++) {
+		Checker report;
+		for (int i=0; i < size; i++) {
 			filename = args[i];
 			JSONObject report_obj = new JSONObject();
-			Checker report = new Checker(filename);
+			report = new Checker(filename);
 			report_obj.put("properties", report.displayDocInfo());
 			report_obj.put("language", report.displayMainLanguage());
 			report_obj.put("tagged_bool", report.displayTaggedBool());
+
+			report_obj.put("tags_info", stree.traverseParentTree());
 			
-			try {
-				report_obj.put("tags_info", stree.traverseParentTree());
-			} catch ( Exception e ) { //root is null
-				report_obj.put("tags_info", new HashMap());
-			}
-	
 			report_obj.put("general_message", report.getGeneralMessage());
 			
 			report.closeDocument();
-			System.out.print(report_obj);
+			System.out.println(report_obj);
 		}
 	}
 }
