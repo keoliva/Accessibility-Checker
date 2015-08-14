@@ -79,6 +79,10 @@ public class StructTree {
 				mcids = parser.getMCIDs();
 				curr_page_img_mcids = mcids.get("img_mcids");
 				all_mcids = mcids.get("all_mcids");
+<<<<<<< HEAD
+=======
+
+>>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
 				COSArray elem = (COSArray) kid;
 				for (int j : all_mcids) {
 					processElement(elem.get(j),figures, headings);

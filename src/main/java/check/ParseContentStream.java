@@ -50,6 +50,13 @@ public class ParseContentStream {
 	static PDPage curr_page;
 	Map<String, Operator> map_ops = new HashMap<String, Operator>();
 	
+<<<<<<< HEAD
+=======
+	public enum Operator {
+		l, Do, BI, BDC, DP, EMC, OTHER;
+	}
+	
+>>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
 	public ParseContentStream( PDPage page ) {
 		curr_page = page;
 		map_ops = Operators.map_ops;

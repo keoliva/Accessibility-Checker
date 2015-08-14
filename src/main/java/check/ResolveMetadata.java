@@ -200,8 +200,12 @@ public class ResolveMetadata {
 	}
 	
 	public static void main(String[] args) throws IOException {
+<<<<<<< HEAD
 		new Operators();
 		String filename = "regionspeak.pdf";
+=======
+		String filename = "socialmicrovolunteering (3).pdf";
+>>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
         Checker report = new Checker(filename);
         System.out.println(report.stree.traverseParentTree());
         System.out.println(report.displayDocInfo());
