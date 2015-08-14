@@ -155,7 +155,7 @@ public class ResolveMetadata {
 				xmp.addDublinCoreSchema();
 				xmp.addPDFSchema();
 				dc = xmp.getDublinCoreSchema();
-				pdf_schema = xmp.getPDFSchema();	
+				pdf_schema = xmp.getPDFSchema();
 		}	
 		switch (status) {
 			case DocInfoIsNullAndXMPIsNull:
@@ -188,13 +188,12 @@ public class ResolveMetadata {
 			default:
 				break;
 		}
-		
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String filename = "11_Final_Copy.pdf";
+		String filename = "socialmicrovolunteering (3).pdf";
         Checker report = new Checker(filename);
-
+        System.out.println(report.stree.traverseParentTree());
         System.out.println(report.displayDocInfo());
         report.closeDocument();
 

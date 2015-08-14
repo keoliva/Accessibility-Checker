@@ -75,16 +75,11 @@ public class StructTree {
 		for (int i=0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
-				try {
-					parser = new ParseContentStream(pages.get(pages_seen));
-					mcids = parser.getMCIDs();
-					curr_page_img_mcids = mcids.get("img_mcids");
-					all_mcids = mcids.get("all_mcids");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					curr_page_img_mcids = new HashSet<Integer>();
-				}
+				parser = new ParseContentStream(pages.get(pages_seen));
+				mcids = parser.getMCIDs();
+				curr_page_img_mcids = mcids.get("img_mcids");
+				all_mcids = mcids.get("all_mcids");
+
 				COSArray elem = (COSArray) kid;
 				for (int j : all_mcids) {
 					processElement(elem.get(j),figures, headings);
