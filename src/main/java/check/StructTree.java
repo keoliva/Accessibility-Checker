@@ -20,16 +20,16 @@ import org.apache.pdfbox.util.PDFOperator;
 
 public class StructTree {
 	PDStructureTreeRoot st_root;
-	static Map<String, Object> role_map;
+	Map role_map;
 
-	static List<PDPage> pages;
-	static Integer pages_seen;
-	static Set<Integer> curr_page_img_mcids;
+	List<PDPage> pages;
+	Integer pages_seen;
+	Set<Integer> curr_page_img_mcids;
 	
-	static boolean figures_warning_on = false; //if there's something off with the figures
+	boolean figures_warning_on; //if there's something off with the figures
 	static int reasonable_amount_of_headings = 5;
-	static boolean headings_warning_on = false;
-	static int headings_count = 0;
+	boolean headings_warning_on;
+	int headings_count;
 	
 	/**
 	 * Constructor
@@ -37,6 +37,7 @@ public class StructTree {
 	 */
 	public StructTree( PDStructureTreeRoot root, List<PDPage> doc_pages ) {
 		st_root = root;
+		role_map = root.getRoleMap();
 		pages = doc_pages;
 		pages_seen = 0;
 	}
@@ -61,7 +62,6 @@ public class StructTree {
 		if (!isValid()) {
 			return new HashMap<String, Object>();
 		}
-		role_map = st_root.getRoleMap();
 		PDNumberTreeNode parent_tree = st_root.getParentTree();
 		COSDictionary dict = parent_tree.getCOSDictionary();
 		String key = (dict.containsKey("Nums")) ? "Nums" : "Kids";
@@ -71,7 +71,7 @@ public class StructTree {
 		
 		ParseContentStream parser;
 		Map<String, Set> mcids;
-		Set<Integer> all_mcids = new HashSet<Integer>();
+		Set<Integer> all_mcids;
 		for (int i=0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
@@ -79,13 +79,11 @@ public class StructTree {
 				mcids = parser.getMCIDs();
 				curr_page_img_mcids = mcids.get("img_mcids");
 				all_mcids = mcids.get("all_mcids");
-<<<<<<< HEAD
-=======
-
->>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
 				COSArray elem = (COSArray) kid;
-				for (int j : all_mcids) {
-					processElement(elem.get(j),figures, headings);
+				if (all_mcids != null) {
+					for (int j : all_mcids) {
+						processElement(elem.get(j), figures, headings);
+					}	
 				}
 				pages_seen++;
 			}
@@ -125,7 +123,7 @@ public class StructTree {
 	 * @param p : the predicate used in the filter
 	 * @return the first instance of a COSInteger object
 	 */
-	public static Integer filterInts( List<?> list) {
+	public static Integer filterInts( List<?> list ) {
 	    for (Object item : list) {
 	      if (elemIsInt((COSBase) item)) {
 	    	  return  ((COSInteger)item).intValue();
@@ -139,7 +137,7 @@ public class StructTree {
 	 * @param tag of the struct elem
 	 * @return if tag is Figure, or if it maps to Figure within the rolemap
 	 */
-	public static boolean isFigure(String tag) {
+	public boolean isFigure( String tag ) {
 		Object value = role_map.get(tag);
 		boolean in_rolemap = (value == null) ? false : value.equals("Figure");
 		return tag.equals("Figure") | in_rolemap;
@@ -150,7 +148,7 @@ public class StructTree {
 	 * @param tag
 	 * @return if tag is a heading, or if it maps to a heading within the rolemap
 	 */
-	public static boolean isHeading(String tag) {
+	public boolean isHeading( String tag ) {
 		Pattern ptrn = Pattern.compile("^H\\d*$"); //Anything of the form H or H1, H2, ...
 		
 		Object value = role_map.get(tag);
@@ -166,7 +164,7 @@ public class StructTree {
 	 * @param figures
 	 * @param headings
 	 */
-	public static void processElement( COSBase elem, Map<Integer, Set> figures, Map<String, Integer> headings ) {
+	public void processElement( COSBase elem, Map<Integer, Set> figures, Map<String, Integer> headings ) {
 		elem = resolve(elem);
 		if (elem instanceof COSDictionary) { //PDStructureElement
 			COSDictionary dict = ((COSDictionary) elem);

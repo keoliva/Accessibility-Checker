@@ -33,13 +33,13 @@ public class Checker {
 	public PDDocument document;
 	private String target;
 	public PDDocumentCatalog root;
-	public static StructTree stree;
+	public StructTree stree;
 	public List<PDPage> pages;
-	private boolean changes_made = false;
+	private boolean changes_made;
 	private boolean changes_made_to_docinfo;
 	
-	private static boolean tagged;
-	private static String main_lang;
+	private boolean tagged;
+	private String main_lang;
 	
 	/**
 	 * Constructor 
@@ -151,7 +151,31 @@ public class Checker {
 			document.close();
 		}
 	}
-
+	
+	static class RunCheck extends Thread {
+		Checker report;
+		JSONObject report_obj = new JSONObject();
+		
+		public RunCheck(Checker checker) {
+			report = checker;
+		}
+		
+		public void run() {
+			report_obj.put("properties", report.displayDocInfo());
+			report_obj.put("language", report.displayMainLanguage());
+			report_obj.put("tagged_bool", report.displayTaggedBool());
+			report_obj.put("tags_info", report.stree.traverseParentTree());			
+			report_obj.put("general_message", report.getGeneralMessage());
+			
+			try {
+				report.closeDocument();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		}
+	}
+	
 	public static void main(String[] args) throws IOException, COSVisitorException {
 		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
 		//String filename = "socialmicrovolunteering.pdf";
@@ -159,20 +183,54 @@ public class Checker {
 		int size = args.length;
 		String filename;
 		Checker report;
+		RunCheck thread;
+		//JSONObject report_obj;
+		//DocInfo doc_info; GeneralMessage msg; MainLanguage lang; TaggedBool bool; TraverseParentTree trav;
+		List<RunCheck> threads = new ArrayList<RunCheck>();
 		for (int i=0; i < size; i++) {
 			filename = args[i];
-			JSONObject report_obj = new JSONObject();
 			report = new Checker(filename);
-			report_obj.put("properties", report.displayDocInfo());
-			report_obj.put("language", report.displayMainLanguage());
-			report_obj.put("tagged_bool", report.displayTaggedBool());
-
-			report_obj.put("tags_info", stree.traverseParentTree());
-			
-			report_obj.put("general_message", report.getGeneralMessage());
-			
-			report.closeDocument();
-			System.out.println(report_obj);
+			thread = new RunCheck(report);
+			thread.start();
+			threads.add(thread);
 		}
+		try {
+			for (Thread thrd : threads) {
+				thrd.join();
+			}
+			
+			for ( Thread thrd : threads ) {
+				System.out.println(((RunCheck) thrd).report_obj);
+			}
+		} catch ( InterruptedException IntExp ) {				
+		}
+			/**doc_info = new DocInfo(report);
+			msg = new GeneralMessage(report);
+			lang = new MainLanguage(report);
+			bool = new TaggedBool(report);
+			trav = new TraverseParentTree(report);
+			doc_info.start();
+			msg.start();
+			lang.start();
+			bool.start();
+			trav.start();
+			try {
+				doc_info.join();
+				msg.join();
+				lang.join();
+				bool.join();
+				trav.join();
+				report_obj.put("properties", doc_info.res);
+				report_obj.put("language", lang.res);
+				report_obj.put("tagged_bool", bool.res);
+
+				report_obj.put("tags_info", trav.res);
+				
+				report_obj.put("general_message", msg.res);
+				
+				report.closeDocument();
+				System.out.println(report_obj);
+			} catch ( InterruptedException IntExp ) {				
+			}*/
 	}
 }

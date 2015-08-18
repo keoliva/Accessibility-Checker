@@ -47,16 +47,9 @@ import org.apache.pdfbox.pdmodel.markedcontent.PDPropertyList;
 import org.apache.pdfbox.util.*;
 
 public class ParseContentStream {
-	static PDPage curr_page;
-	Map<String, Operator> map_ops = new HashMap<String, Operator>();
-	
-<<<<<<< HEAD
-=======
-	public enum Operator {
-		l, Do, BI, BDC, DP, EMC, OTHER;
-	}
-	
->>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
+	PDPage curr_page;
+	Map<String, Operator> map_ops;
+
 	public ParseContentStream( PDPage page ) {
 		curr_page = page;
 		map_ops = Operators.map_ops;
@@ -121,5 +114,9 @@ public class ParseContentStream {
 		} catch (IOException e) {
 			return result;
 		}
+	}
+	
+	public static void main(String[] args) {
+		
 	}
 }

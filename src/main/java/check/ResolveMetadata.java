@@ -17,9 +17,9 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 
 public class ResolveMetadata {
-	private static PDDocumentCatalog root;
-	private static PDDocumentInformation document_info;
-	private static PDMetadata metadata;
+	private PDDocumentCatalog root;
+	private PDDocumentInformation document_info;
+	private PDMetadata metadata;
 	private COSDictionary docinfo;
 	private boolean changes_made_to_metadata = false;
 	private boolean changes_made_to_docinfo = false;
@@ -131,7 +131,6 @@ public class ResolveMetadata {
 		} else {
 			for (String author : authors) {
 				if (!doc_author.contains(author.toLowerCase()))
-					
 					return false;
 			}
 		}
@@ -200,12 +199,8 @@ public class ResolveMetadata {
 	}
 	
 	public static void main(String[] args) throws IOException {
-<<<<<<< HEAD
 		new Operators();
 		String filename = "regionspeak.pdf";
-=======
-		String filename = "socialmicrovolunteering (3).pdf";
->>>>>>> 13deffac57d8534bc24cf18e95b5a193d1185ea8
         Checker report = new Checker(filename);
         System.out.println(report.stree.traverseParentTree());
         System.out.println(report.displayDocInfo());

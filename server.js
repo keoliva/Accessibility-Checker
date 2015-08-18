@@ -29,7 +29,6 @@ app.route('/')
 			for (var i=0; i < len; i++) {
 				outputs.push(output_str[i]);
 			}
-			console.log(outputs);
 			res.redirect('/edit/0');
 			/**i++;
 			if (i < files.length) {
@@ -47,7 +46,7 @@ app.route('/')
 				paths += " ";
 				paths += files[i]['path'];
 			}
-			console.log(paths);
+
 			var cmd = 'java -cp target/accessibility-0.0.1-SNAPSHOT.jar check/Checker ' + paths;
 			child_process.exec(cmd,
 			function (err, stdout, stderr) {
