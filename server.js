@@ -30,15 +30,9 @@ app.route('/')
 				outputs.push(output_str[i]);
 			}
 			res.redirect('/edit/0');
-			/**i++;
-			if (i < files.length) {
-				run_cmd();
-			} else {
-				res.redirect('/edit/0');
-			}	*/
 		}
 		function run_cmd() {
-			//files[i]['path']
+			//puts all file's path names into one string
 			var paths = "";
 			var len = files.length;
 			paths += files[0]['path'];
@@ -79,7 +73,6 @@ app.route('/edit/:id')
 			curr_file_index: id,
 			output: JSON.parse(outputs[id])
 		};
-		console.log(doc_data.output);
 		var edit_html = path.join(__dirname + '/edit.html');
 		res.end(swig.renderFile("edit.html", {data:doc_data}));
 	});

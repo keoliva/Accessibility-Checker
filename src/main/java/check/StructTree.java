@@ -62,8 +62,9 @@ public class StructTree {
 		if (!isValid()) {
 			return new HashMap<String, Object>();
 		}
-		PDNumberTreeNode parent_tree = st_root.getParentTree();
-		COSDictionary dict = parent_tree.getCOSDictionary();
+		//dictionary of the parent tree in the structure tree root
+		COSDictionary dict = st_root.getParentTree().getCOSDictionary();
+		//the key is either Nums or Kids XOR
 		String key = (dict.containsKey("Nums")) ? "Nums" : "Kids";
 		COSArray kids = (COSArray) dict.getItem(key);
 		Map<Integer, Set> figures = new HashMap<Integer, Set>();
@@ -72,7 +73,7 @@ public class StructTree {
 		ParseContentStream parser;
 		Map<String, Set> mcids;
 		Set<Integer> all_mcids;
-		for (int i=0; i < kids.size(); i++) {
+		for (int i = 0; i < kids.size(); i++) {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
 				parser = new ParseContentStream(pages.get(pages_seen));
@@ -82,6 +83,8 @@ public class StructTree {
 				COSArray elem = (COSArray) kid;
 				if (all_mcids != null) {
 					for (int j : all_mcids) {
+						//The marked content ids gathered, are the 
+						// keys to structure elements within the page
 						processElement(elem.get(j), figures, headings);
 					}	
 				}
@@ -133,7 +136,6 @@ public class StructTree {
 	}
 	
 	/**
-	 * 
 	 * @param tag of the struct elem
 	 * @return if tag is Figure, or if it maps to Figure within the rolemap
 	 */
@@ -170,6 +172,7 @@ public class StructTree {
 			COSDictionary dict = ((COSDictionary) elem);
 			String tag = dict.getNameAsString(COSName.S);
 			
+			//Get the marked content ID of the structure element
 			Integer mcid;
 			COSBase k_item = resolve(dict.getItem(COSName.K));
 			if (k_item instanceof COSInteger) {
@@ -177,8 +180,9 @@ public class StructTree {
 			} else { //An array
 				mcid = filterInts(((COSArray) k_item).toList());
 			}
+			
 			if (tag != null) {
-				if (curr_page_img_mcids.contains(mcid)) {
+				if (curr_page_img_mcids.contains( mcid )) {
 					Map<String, Object> figure_dict = new HashMap<String, Object>();
 					figure_dict.put("Alt", dict.getString(COSName.ALT, "None"));
 					figure_dict.put("MCID", mcid);
@@ -188,13 +192,14 @@ public class StructTree {
 									+ "rather than a Figure.", tag));
 						figures_warning_on = true;
 					}
+					//since pages_seen is zero indexed
 					Set figure_objs = figures.get(pages_seen + 1);
 					if (figure_objs == null) {
 						figure_objs = new HashSet();
 					}
 					figure_objs.add(figure_dict);
 					figures.put(pages_seen + 1, figure_objs);
-				} else if (isHeading(tag)) {
+				} else if (isHeading( tag )) {
 					Integer count = headings.get(tag);
 					headings.put(tag, (count == null)? 1 : count + 1);
 					headings_count++;

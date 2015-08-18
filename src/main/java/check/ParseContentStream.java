@@ -64,15 +64,22 @@ public class ParseContentStream {
 		Map<String, Set> result = new HashMap<String, Set>();
 		try {
 			List<Object> tokens = curr_page.getContents().getStream().getStreamTokens();
+			//all marked content ids
 			Set<Integer> all_mcids = new HashSet<Integer>();
+			//an index for the marked content ids of images
 			Set<Integer> img_mcids = new HashSet<Integer>();
+			//indices of certain operators, all within 
+			//Operators.map_ops field
 			List<Integer> indices = new ArrayList<Integer>();
-			ListIterator<Integer> op_iterator; boolean find_lines = true;
+			ListIterator<Integer> op_iterator; 
+			Operator op;
+			String operation;
+			boolean find_lines = true;
 			for (int i = 0; i < tokens.size(); i++) {
 				Object obj = tokens.get(i);
 				if (obj instanceof PDFOperator) {
-					String operation = ((PDFOperator) obj).getOperation();
-					Operator op = map_ops.get(operation);
+					operation = ((PDFOperator) obj).getOperation();
+					op = map_ops.get(operation);
 					op = (op == null) ? Operator.OTHER : op;
 					switch( op ) {
 						case l:
@@ -82,7 +89,9 @@ public class ParseContentStream {
 						case DP://also marks content and has a properties list as an operand
 						case EMC://Ending of marked content
 							indices.add(i);
+							//refers to an image, or line being drawn
 							if (operation.equals("Do") | operation.equals("BI") | operation.equals("l")) {
+								//must 
 								if (operation.equals("l")) {
 									if (!find_lines) continue;
 									else find_lines = false;
@@ -94,7 +103,7 @@ public class ParseContentStream {
 									String prev_op = ((PDFOperator) tokens.get(prev_i)).getOperation();
 									
 									if (prev_op.equals("BDC") | prev_op.equals("DP")) {
-										//the operand of BDC is a COSDictionary
+										//their operand is a COSDictionary
 										int mcid = ((COSDictionary) tokens.get(prev_i-1)).getInt(COSName.MCID);
 										if (mcid >= 0) img_mcids.add(mcid);
 									}
@@ -114,9 +123,5 @@ public class ParseContentStream {
 		} catch (IOException e) {
 			return result;
 		}
-	}
-	
-	public static void main(String[] args) {
-		
 	}
 }

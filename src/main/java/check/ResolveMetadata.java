@@ -62,40 +62,44 @@ public class ResolveMetadata {
 		}
 	}
 	
+	/**
+	 * gets a map including certain metadata (title, author, 
+	 * subject, keywords), a boolean of whether or not any of the 
+	 * two forms of metadata (xmp metadata, document information) 
+	 * were updated, and if any values are updated, a dictionary 
+	 * with the original entries are included
+	 * @return a map where the values are about the metadata 
+	 */
 	public Map<String, Object> getProperties() {
+		Map<String, String> orig_properties = new HashMap<String, String>();
+		orig_properties.put("title", docinfo.getString(COSName.TITLE, ""));
+		orig_properties.put("author", docinfo.getString(COSName.AUTHOR, ""));
+		orig_properties.put("subject", docinfo.getString(COSName.SUBJECT, ""));
+		orig_properties.put("keywords", docinfo.getString(COSName.KEYWORDS, ""));
 		try {
 			resolve();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		Map<String, String> orig_properties = new HashMap<String, String>();
-		
-		try {
-			orig_properties.put("title", docinfo.getString(COSName.TITLE, ""));
-			orig_properties.put("author", docinfo.getString(COSName.AUTHOR, ""));
-			orig_properties.put("subject", docinfo.getString(COSName.SUBJECT, ""));
-			orig_properties.put("keywords", docinfo.getString(COSName.KEYWORDS, ""));
-		} catch ( Exception e ) { //root is null
-		}
-		
-		Map<String, Object> properties = new HashMap<String, Object>();
-		try {
+		Map<String, Object> properties = new HashMap<String, Object>(orig_properties);
+		properties.put("changes_made", changes_made_to_docinfo | changes_made_to_metadata);
+		if (changes_made_to_docinfo)
+			properties.put("orig_prop", orig_properties);
 			properties.put("title", docinfo.getString(COSName.TITLE, ""));
-			
 			properties.put("author", docinfo.getString(COSName.AUTHOR, ""));
 			properties.put("subject", docinfo.getString(COSName.SUBJECT, ""));
 			properties.put("keywords", docinfo.getString(COSName.KEYWORDS, ""));
-			if (changes_made_to_docinfo)
-				properties.put("orig_prop", orig_properties);
-			properties.put("changes_made", changes_made_to_docinfo | changes_made_to_metadata);
-		} catch ( Exception e ) { //root is null
-		}
 		return properties;
 	}
 	
-	private String join(List list, String delim) {
+	/**
+	 * joins the elements in a list with the delim parameter
+	 * @param list
+	 * @param delim the delimiter
+	 * @return a string with the elements in the list delimited by 
+	 * the delimiter
+	 */
+	private String join( List list, String delim ) {
 		StringBuilder result = new StringBuilder();
 		if (list == null) 
 			return "";
@@ -111,13 +115,23 @@ public class ResolveMetadata {
 		return result.toString();
 	}
 	
-	private String resolveStr(String str) {
+	/**
+	 * @param str
+	 * @return str if it's not null and the empty string if it is
+	 */
+	private String resolveStr( String str ) {
 		if (str == null)
 			return "";
 		return str.toLowerCase();
 	}
 	
-	private boolean entriesAreNotDifferent(XMPSchemaDublinCore dc, XMPSchemaPDF pdf) {
+	/**
+	 * @param dc dublin core of the xmp metadata
+	 * @param pdf pdf schema of the xmp metadata
+	 * @return whether or not the document information important keys, 
+	 * and the xmp metadata are different
+	 */
+	private boolean entriesAreNotDifferent( XMPSchemaDublinCore dc, XMPSchemaPDF pdf ) {
 		boolean result = false;
 		//check titles
 		if (!resolveStr(document_info.getTitle()).equals(resolveStr(dc.getTitle())))
@@ -143,6 +157,11 @@ public class ResolveMetadata {
 		return true;
 	}
 	
+	/**
+	 * based on the status of the metadata, the necessary 
+	 * changes are made
+	 * @throws IOException
+	 */
 	public void resolve() throws IOException {	
 		boolean loaded_xmp = false; 
 		XMPMetadata xmp = new XMPMetadata(); 
@@ -165,7 +184,7 @@ public class ResolveMetadata {
 				dc = xmp.getDublinCoreSchema();
 				pdf_schema = xmp.getPDFSchema();
 		}	
-		switch (status) {
+		switch ( status ) {
 			case DocInfoIsNullAndXMPIsNull:
 				changes_made_to_metadata = true;
 				break;
@@ -197,13 +216,4 @@ public class ResolveMetadata {
 				break;
 		}
 	}
-	
-	public static void main(String[] args) throws IOException {
-		new Operators();
-		String filename = "regionspeak.pdf";
-        Checker report = new Checker(filename);
-        System.out.println(report.stree.traverseParentTree());
-        System.out.println(report.displayDocInfo());
-        report.closeDocument();
-	}	
 }

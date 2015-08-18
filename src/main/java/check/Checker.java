@@ -152,6 +152,14 @@ public class Checker {
 		}
 	}
 	
+	/**
+	 * a thread that gets certain attributes of a document
+	 * including certain metadat, the language, whether or not it's 
+	 * tagged, the alternative text of images, the headings, and 
+	 * a general message about the accessibility of the document
+	 * @author Kayla
+	 *
+	 */
 	static class RunCheck extends Thread {
 		Checker report;
 		JSONObject report_obj = new JSONObject();
@@ -160,6 +168,7 @@ public class Checker {
 			report = checker;
 		}
 		
+		@Override
 		public void run() {
 			report_obj.put("properties", report.displayDocInfo());
 			report_obj.put("language", report.displayMainLanguage());
@@ -176,16 +185,12 @@ public class Checker {
 		}
 	}
 	
-	public static void main(String[] args) throws IOException, COSVisitorException {
-		//String filename = "VISM_ASSETS_Camera_Ready.pdf";
-		//String filename = "socialmicrovolunteering.pdf";
+	public static void main( String[] args ) throws IOException, COSVisitorException {
 		new Operators();
 		int size = args.length;
 		String filename;
 		Checker report;
 		RunCheck thread;
-		//JSONObject report_obj;
-		//DocInfo doc_info; GeneralMessage msg; MainLanguage lang; TaggedBool bool; TraverseParentTree trav;
 		List<RunCheck> threads = new ArrayList<RunCheck>();
 		for (int i=0; i < size; i++) {
 			filename = args[i];
@@ -198,39 +203,10 @@ public class Checker {
 			for (Thread thrd : threads) {
 				thrd.join();
 			}
-			
 			for ( Thread thrd : threads ) {
 				System.out.println(((RunCheck) thrd).report_obj);
 			}
 		} catch ( InterruptedException IntExp ) {				
 		}
-			/**doc_info = new DocInfo(report);
-			msg = new GeneralMessage(report);
-			lang = new MainLanguage(report);
-			bool = new TaggedBool(report);
-			trav = new TraverseParentTree(report);
-			doc_info.start();
-			msg.start();
-			lang.start();
-			bool.start();
-			trav.start();
-			try {
-				doc_info.join();
-				msg.join();
-				lang.join();
-				bool.join();
-				trav.join();
-				report_obj.put("properties", doc_info.res);
-				report_obj.put("language", lang.res);
-				report_obj.put("tagged_bool", bool.res);
-
-				report_obj.put("tags_info", trav.res);
-				
-				report_obj.put("general_message", msg.res);
-				
-				report.closeDocument();
-				System.out.println(report_obj);
-			} catch ( InterruptedException IntExp ) {				
-			}*/
 	}
 }
