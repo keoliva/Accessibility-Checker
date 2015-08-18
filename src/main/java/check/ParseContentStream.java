@@ -82,7 +82,7 @@ public class ParseContentStream {
 					op = map_ops.get(operation);
 					op = (op == null) ? Operator.OTHER : op;
 					switch( op ) {
-						case l:
+						case l://Append straight line segment to path
 						case Do://An image is being painted, refers to indirect reference to an image
 						case BI://Refers to an inline image
 						case BDC://Beginning of marked content with a properties list as an operand
@@ -95,8 +95,18 @@ public class ParseContentStream {
 								if (operation.equals("l")) {
 									if (!find_lines) continue;
 									else find_lines = false;
+								} else if (operation.equals("Do")) {
+									//operand is a COSName/key to an XObject in the 
+									// page's resources. Have to check the xobject 
+									// has a subtype of Image rather than Form
+									String key = ((COSName) tokens.get(i - 1)).getName();
+									if (!(curr_page.getResources().getXObjects().get( key ) 
+											instanceof PDXObjectImage)) {
+										continue;
+									}
 								}
-								//pointer is next to the operator before this Do
+								//pointer is next to the operator before the drawing operators 
+								// (Do, BI, or l)
 								op_iterator = indices.listIterator(indices.size()-1);
 								if (op_iterator.hasPrevious()) {
 									int prev_i = op_iterator.previous();
@@ -109,6 +119,7 @@ public class ParseContentStream {
 									}
 								}
 							} else if (operation.equals("BDC") | operation.equals("DP")) {
+								//their operand is a COSDictionary
 								int mcid = ((COSDictionary) tokens.get(i-1)).getInt(COSName.MCID);
 								if (mcid >= 0) all_mcids.add(mcid);
 							}
