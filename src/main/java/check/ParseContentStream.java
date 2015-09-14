@@ -47,12 +47,14 @@ import org.apache.pdfbox.pdmodel.markedcontent.PDPropertyList;
 import org.apache.pdfbox.util.*;
 
 public class ParseContentStream {
-	PDPage curr_page;
-	Map<String, Operator> map_ops;
+	private PDPage curr_page;
+	private Map<String, Operator> map_ops;
+	private int max_mcid;
 
-	public ParseContentStream( PDPage page ) {
+	public ParseContentStream( PDPage page, int max_mcid ) {
 		curr_page = page;
 		map_ops = Operators.map_ops;
+		this.max_mcid = max_mcid;
 	}
 	
 	/**
@@ -115,13 +117,15 @@ public class ParseContentStream {
 									if (prev_op.equals("BDC") | prev_op.equals("DP")) {
 										//their operand is a COSDictionary
 										int mcid = ((COSDictionary) tokens.get(prev_i-1)).getInt(COSName.MCID);
-										if (mcid >= 0) img_mcids.add(mcid);
+										System.out.println(String.format("Image MCID: %d", mcid));
+										if (mcid >= 0 && mcid < max_mcid) img_mcids.add(mcid);
 									}
 								}
 							} else if (operation.equals("BDC") | operation.equals("DP")) {
 								//their operand is a COSDictionary
 								int mcid = ((COSDictionary) tokens.get(i-1)).getInt(COSName.MCID);
-								if (mcid >= 0) all_mcids.add(mcid);
+								if (mcid > max_mcid) System.out.println(String.format("index %d is greater than max %d", mcid, max_mcid));
+								if (mcid >= 0 && mcid < max_mcid) all_mcids.add(mcid);
 							}
 							break;
 						default: break;
