@@ -107,24 +107,22 @@ public class ParseContentStream {
 										continue;
 									}
 								}
+							
 								//pointer is next to the operator before the drawing operators 
 								// (Do, BI, or l)
 								op_iterator = indices.listIterator(indices.size()-1);
 								if (op_iterator.hasPrevious()) {
 									int prev_i = op_iterator.previous();
 									String prev_op = ((PDFOperator) tokens.get(prev_i)).getOperation();
-									
 									if (prev_op.equals("BDC") | prev_op.equals("DP")) {
 										//their operand is a COSDictionary
 										int mcid = ((COSDictionary) tokens.get(prev_i-1)).getInt(COSName.MCID);
-										System.out.println(String.format("Image MCID: %d", mcid));
 										if (mcid >= 0 && mcid < max_mcid) img_mcids.add(mcid);
 									}
 								}
 							} else if (operation.equals("BDC") | operation.equals("DP")) {
 								//their operand is a COSDictionary
 								int mcid = ((COSDictionary) tokens.get(i-1)).getInt(COSName.MCID);
-								if (mcid > max_mcid) System.out.println(String.format("index %d is greater than max %d", mcid, max_mcid));
 								if (mcid >= 0 && mcid < max_mcid) all_mcids.add(mcid);
 							}
 							break;
