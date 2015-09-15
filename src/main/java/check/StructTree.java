@@ -15,6 +15,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDNumberTreeNode;
 import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.*;
+import org.apache.pdfbox.pdmodel.graphics.xobject.PDXObjectImage;
 import org.apache.pdfbox.pdmodel.markedcontent.PDPropertyList;
 import org.apache.pdfbox.util.PDFOperator;
 
@@ -23,7 +24,8 @@ public class StructTree {
 	Map role_map;
 
 	List<PDPage> pages;
-	Integer pages_seen;
+	Map<Integer, Integer> structparents_to_pages;
+	Integer curr_page_index;
 	Set<Integer> curr_page_img_mcids;
 	
 	boolean figures_warning_on; //if there's something off with the figures
@@ -38,8 +40,12 @@ public class StructTree {
 	public StructTree( PDStructureTreeRoot root, List<PDPage> doc_pages ) {
 		st_root = root;
 		role_map = root.getRoleMap();
-		pages = doc_pages;
-		pages_seen = 0;
+		pages = doc_pages;	
+		structparents_to_pages = new HashMap<Integer, Integer>();
+		for (int p = 0; p < pages.size(); p++) {
+			structparents_to_pages.put(pages.get(p).getStructParents(), p);
+		}
+		//System.out.println(structparents_to_pages);
 	}
 	
 	/**
@@ -77,12 +83,25 @@ public class StructTree {
 			COSBase kid = resolve(kids.get(i));
 			if (kid instanceof COSArray) {//represents a page
 				COSArray elem = (COSArray) kid;
-				System.out.println("Page " + pages_seen);
-				parser = new ParseContentStream(pages.get(pages_seen), elem.size());
+				int index = 0;
+				while (elem.get(index) == null)
+					index++;
+				// Find a marked content item, and look at its "Pg" entry which represents 
+				// the page that the content item is being held, to be certain of which page 
+				// to parse
+				COSDictionary item = (COSDictionary) ((COSObject) elem.get(index)).getObject();
+				COSDictionary pg = (COSDictionary) item.getDictionaryObject(COSName.PG);
+				
+				curr_page_index = structparents_to_pages.get(pg.getInt(COSName.STRUCT_PARENTS));
+				//System.out.println("Page " + (curr_page_index + 1));
+				
+				parser = new ParseContentStream(pages.get(curr_page_index), elem.size());
 				mcids = parser.getMCIDs();
+				
 				curr_page_img_mcids = mcids.get("img_mcids");
+				
 				all_mcids = mcids.get("all_mcids");
-				System.out.println(all_mcids);
+
 				if (all_mcids != null) {
 					for (int j : all_mcids) {
 						//The marked content ids gathered, are the 
@@ -90,7 +109,6 @@ public class StructTree {
 						processElement(elem.get(j), figures, headings);
 					}	
 				}
-				pages_seen++;
 			}
 		}
 		Map<String, Object> objs = new HashMap<String, Object>();
@@ -160,6 +178,20 @@ public class StructTree {
 		return ptrn.matcher(tag).find() | in_rolemap;
 	}
 	
+	/**private boolean isImageXObject() {
+		//operand is a COSName/key to an XObject in the 
+		// page's resources. Have to check the xobject 
+		// has a subtype of Image rather than Form
+		String key = ((COSName) tokens.get(i - 1)).getName();
+		if (!(curr_page.getResources().getXObjects().get( key ) 
+				instanceof PDXObjectImage)) {
+			continue;
+		}
+	}*/
+	private boolean hasAltText( COSDictionary dict ) {
+		return dict.getString(COSName.ALT, null) != null;
+	}
+	
 	/**
 	 * updates figures array and headings dictionary if any 
 	 * elem has type either Figure or is a type of heading
@@ -184,7 +216,8 @@ public class StructTree {
 			}
 			
 			if (tag != null) {
-				if (curr_page_img_mcids.contains( mcid )) {
+				//System.out.println(tag);
+				if (isFigure( tag ) || hasAltText( dict ) || curr_page_img_mcids.contains( mcid )) {
 					Map<String, Object> figure_dict = new HashMap<String, Object>();
 					figure_dict.put("Alt", dict.getString(COSName.ALT, "None"));
 					figure_dict.put("MCID", mcid);
@@ -195,12 +228,12 @@ public class StructTree {
 						figures_warning_on = true;
 					}
 					//since pages_seen is zero indexed
-					Set figure_objs = figures.get(pages_seen + 1);
+					Set figure_objs = figures.get(curr_page_index + 1);
 					if (figure_objs == null) {
 						figure_objs = new HashSet();
 					}
 					figure_objs.add(figure_dict);
-					figures.put(pages_seen + 1, figure_objs);
+					figures.put(curr_page_index + 1, figure_objs);
 				} else if (isHeading( tag )) {
 					Integer count = headings.get(tag);
 					headings.put(tag, (count == null)? 1 : count + 1);
